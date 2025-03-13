@@ -1,0 +1,12 @@
+requests
+python-dotenv
+bs4
+pandas
+
+fastapi==0.115.6
+uvicorn==0.34.0
+pytest==8.3.4
+
+sqlalchemy==1.4.44
+pydantic==2.10.4
+psycopg2-binary==2.9.10
