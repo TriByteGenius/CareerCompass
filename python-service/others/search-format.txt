@@ -1,0 +1,8 @@
+    LEVER = "lever.co"
+    GREENHOUSE = "boards.greenhouse.io/*/jobs/*"
+    ASHBY = "ashbyhq.com"
+
+    site:linkedin.com/jobs/view "software engineer" "Ireland"
+
+    site:lever.co "software engineer" "Ireland"
+    site:lever.co ("Software Engineer" OR "Backend Developer") "Ireland"
