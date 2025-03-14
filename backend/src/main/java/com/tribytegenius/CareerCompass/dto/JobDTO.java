@@ -17,4 +17,5 @@ public class JobDTO {
     private LocalDateTime time;
     private String status;
     private String url;
+    private String website;
 }

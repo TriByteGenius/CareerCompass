@@ -36,4 +36,7 @@ public class Job {
 
     @Column(nullable = false)
     private String url;
+
+    @Column(nullable = false)
+    private String website;
 }
