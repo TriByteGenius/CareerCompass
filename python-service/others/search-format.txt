@@ -2,6 +2,11 @@
     GREENHOUSE = "boards.greenhouse.io/*/jobs/*"
     ASHBY = "ashbyhq.com"
 
+    INDEED = "ie.indeed.com/viewjob"
+    LINKEDIN = "linkedin.com/jobs/view"
+    IRISHJOBS =  "www.irishjobs.ie/job/"
+    JOBS = "www.jobs.ie/job"
+
     site:linkedin.com/jobs/view "software engineer" "Ireland"
 
     site:lever.co "software engineer" "Ireland"

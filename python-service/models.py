@@ -16,3 +16,4 @@ class Job(Base):
     time = Column(DateTime, nullable=False)
     status = Column(String, nullable=False)
     url = Column(String, nullable=False)
+    website = Column(String, nullable=False)
