@@ -47,6 +47,7 @@ public class JobServiceImpl implements JobService {
         existingJob.setType(jobDTO.getType());
         existingJob.setLocation(jobDTO.getLocation());
         existingJob.setUrl(jobDTO.getUrl());
+        existingJob.setWebsite(jobDTO.getWebsite());
 
         Job updatedJob = jobRepository.save(existingJob);
         return modelMapper.map(updatedJob, JobDTO.class);
