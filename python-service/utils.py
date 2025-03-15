@@ -16,7 +16,7 @@ WEBSITE_MAPPING = {
 
 def generate_keywords(schema: JobUpdateRequestSchema) -> str:
     # Map selected websites to their URLs
-    site_filter = WEBSITE_MAPPING[schema.websites]
+    site_filter = WEBSITE_MAPPING[schema.website]
 
     # Create job type filter (e.g., ("Software Engineer" | "Backend Developer"))
     newtype = [f'"{job}"' for job in schema.type]
@@ -87,7 +87,7 @@ def get_jobs(schema: JobUpdateRequestSchema):
         job.url = item.get("link", "")
         job.time = extract_time(item)
         job.status = "new"
-        job.website = schema.websites
+        job.website = schema.website
         
         title = item['htmlTitle']
 
@@ -102,7 +102,7 @@ def get_jobs(schema: JobUpdateRequestSchema):
             job.type = "Unknown"
             job.location = "Unknown"
 
-        print(job.company, job.type, job.location)
+        # print(job.company, job.type, job.location)
 
         jobs.append(job)
     

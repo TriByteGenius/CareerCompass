@@ -1,19 +1,30 @@
 package com.tribytegenius.CareerCompass.service.impl;
 
 import com.tribytegenius.CareerCompass.dto.JobDTO;
+import com.tribytegenius.CareerCompass.dto.SearchRequestBody;
 import com.tribytegenius.CareerCompass.exception.ResourceNotFoundException;
 import com.tribytegenius.CareerCompass.model.Job;
 import com.tribytegenius.CareerCompass.repository.JobRepository;
 import com.tribytegenius.CareerCompass.service.JobService;
+
+import reactor.core.publisher.Mono;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class JobServiceImpl implements JobService {
+
+    @Autowired
+    @Qualifier("pythonServiceClient")
+    private WebClient pythonServiceClient;
+
     @Autowired
     private JobRepository jobRepository;
 
@@ -59,5 +70,16 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "id", id));
         jobRepository.delete(existingJob);
         return "Job deleted";
+    }
+
+    @Override
+    public void searchJob(SearchRequestBody searchRequestBody) {
+        pythonServiceClient.post()
+            .bodyValue(searchRequestBody)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .onErrorResume(e -> {
+                return Mono.error(new RuntimeException("Failed to call pythonServiceClient: " + e.getMessage()));
+            });
     }
 }
