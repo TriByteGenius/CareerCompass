@@ -28,7 +28,7 @@ public class JobController {
         return new ResponseEntity<>(createdJobDTO, HttpStatus.CREATED);
     }
 
-    @PostMapping
+    @PostMapping("/search")
     public void searchJob(@RequestBody SearchRequestBody searchRequestBody) {
         jobService.searchJob(searchRequestBody);
     }
