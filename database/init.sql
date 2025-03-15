@@ -9,5 +9,6 @@ CREATE TABLE jobs (
     location VARCHAR NOT NULL,
     time TIMESTAMP NOT NULL,
     status VARCHAR NOT NULL,
-    url VARCHAR NOT NULL
+    url VARCHAR NOT NULL,
+    weisite VARCHAR NOT NULL
 );

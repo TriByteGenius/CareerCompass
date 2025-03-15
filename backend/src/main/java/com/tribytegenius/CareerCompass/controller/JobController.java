@@ -1,6 +1,7 @@
 package com.tribytegenius.CareerCompass.controller;
 
 import com.tribytegenius.CareerCompass.dto.JobDTO;
+import com.tribytegenius.CareerCompass.dto.SearchRequestBody;
 import com.tribytegenius.CareerCompass.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,11 @@ public class JobController {
     public ResponseEntity<JobDTO> createJob(@RequestBody JobDTO jobDTO) {
         JobDTO createdJobDTO = jobService.createJob(jobDTO);
         return new ResponseEntity<>(createdJobDTO, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/search")
+    public void searchJob(@RequestBody SearchRequestBody searchRequestBody) {
+        jobService.searchJob(searchRequestBody);
     }
 
     @PutMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.tribytegenius.CareerCompass.service;
 
 import com.tribytegenius.CareerCompass.dto.JobDTO;
+import com.tribytegenius.CareerCompass.dto.SearchRequestBody;
 
 import java.util.List;
 
@@ -12,4 +13,6 @@ public interface JobService {
     JobDTO updateJob(Long id, JobDTO jobDTO);
 
     String deleteJob(Long id);
+
+    void searchJob(SearchRequestBody searchRequestBody);
 }

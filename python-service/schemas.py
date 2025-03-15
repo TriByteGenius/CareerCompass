@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 class JobUpdateRequestSchema(BaseModel):
 
-    websites : str
+    website : str
     type: List[str]
     location: str
     time: int

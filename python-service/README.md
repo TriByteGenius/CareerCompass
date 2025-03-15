@@ -15,7 +15,7 @@
 #### Request Body:
 ```json
 {
-    "websites": "LINKEDIN",
+    "website": "LINKEDIN",
     "type": ["Software Engineer", "Backend Developer"],
     "location": "Ireland",
     "time": 1
