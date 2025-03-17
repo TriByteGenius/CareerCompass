@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../api/api';
 
 const initialState = {
   user: null,
@@ -13,7 +13,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/auth/signin', credentials);
+      const response = await api.post('/auth/signin', credentials);
       localStorage.setItem('token', response.data.jwtToken);
       return response.data;
     } catch (error) {
@@ -26,7 +26,7 @@ export const signup = createAsyncThunk(
   'auth/signup',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/auth/signup', userData);
+      const response = await api.post('/auth/signup', userData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Signup failed');
@@ -39,7 +39,7 @@ export const getCurrentUser = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const response = await axios.get('/api/auth/user', {
+      const response = await api.get('/auth/user', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await axios.post('/api/auth/signout');
+      await api.post('/auth/signout');
       localStorage.removeItem('token');
       return null;
     } catch (error) {

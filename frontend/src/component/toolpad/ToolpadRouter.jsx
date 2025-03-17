@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/slices/authSlice';
@@ -13,13 +14,15 @@ import SidebarFooter from './SidebarFooter';
 import JobPage from '../job/JobPage'
 import Home from '../home/Home'
 import Favorite from '../user/Favorite'
-import Login from '../auth/Login'
-import Register from '../auth/Register'
+import Signin from '../auth/Signin'
+import Signup from '../auth/Signup'
 
 function ToolpadRouter() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useSelector(state => state.auth);
+  const [signinOpen, setSigninOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
   
   const session = isAuthenticated && user ? {
     user: {
@@ -31,37 +34,67 @@ function ToolpadRouter() {
 
   const authentication = {
     signIn: () => {
-      navigate('/login');
+      openSignin();
     },
     signOut: () => {
-      dispatch(logout())
+      dispatch(logout());
       navigate('/');
     }
   };
 
+  const openSignin = () => {
+    setSigninOpen(true);
+    setSignupOpen(false);
+  };
+
+  const closeSignin = () => {
+    setSigninOpen(false);
+  };
+
+  const openSignup = () => {
+    setSignupOpen(true);
+    setSigninOpen(false);
+  };
+
+  const closeSignup = () => {
+    setSignupOpen(false);
+  };
+
   return (
-    <ReactRouterAppProvider
-      navigation={Navigation}
-      theme={Theme}
-      session={session}
-      authentication={authentication}
-    >
-      <DashboardLayout
-        slots={{
-          appTitle: AppTitle,
-          sidebarFooter: SidebarFooter,
-        }}
+    <>
+      <Signin
+        open={signinOpen} 
+        onClose={closeSignin} 
+        openSignup={openSignup} 
+      />
+      <Signup
+        open={signupOpen} 
+        onClose={closeSignup} 
+        openSignin={openSignin} 
+      />
+      <ReactRouterAppProvider
+        navigation={Navigation}
+        theme={Theme}
+        session={session}
+        authentication={authentication}
       >
-        <Routes>
-          <Route path='' element={<Home/>}/>
-          <Route path='jobs' element={<JobPage />}/>
-          <Route path='favorites' element={<Favorite />}/>
-          <Route path='login' element={<Login />}/>
-          <Route path='register' element={<Register />}/>
-        </Routes>
-        <Toaster position='top-center'/>
-      </DashboardLayout>
-    </ReactRouterAppProvider>
+        <DashboardLayout
+          slots={{
+            appTitle: AppTitle,
+            sidebarFooter: SidebarFooter,
+          }}
+        >
+          <Routes>
+            <Route path='' element={<Home/>}/>
+            <Route path='signin' element={<Signin />}/>
+            <Route path='signup' element={<Signup />}/>
+            <Route path='jobs' element={<JobPage />}/>
+            <Route path='favorites' element={<Favorite />}/>
+          </Routes>
+          <Toaster position='top-center'/>
+        </DashboardLayout>
+      </ReactRouterAppProvider>
+    </>
   );
 }
 
