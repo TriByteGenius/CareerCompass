@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../api/api';
 
 const initialState = {
   jobs: [],
@@ -35,7 +35,7 @@ export const fetchJobs = createAsyncThunk(
         ...filters,
       };
       
-      const response = await axios.get('/api/jobs', {
+      const response = await api.get('/jobs', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -54,7 +54,7 @@ export const searchJobs = createAsyncThunk(
   async (searchData, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      await axios.post('/api/jobs/search', searchData, {
+      await api.post('/jobs/search', searchData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
