@@ -24,23 +24,9 @@ const initialState = {
 
 export const fetchJobs = createAsyncThunk(
   'jobs/fetchJobs',
-  async (_, { getState, rejectWithValue }) => {
+  async (queryString, { rejectWithValue }) => {
     try {
-      const { token } = getState().auth;
-      const { filters, pageNumber, pageSize } = getState().jobs;
-      
-      const params = {
-        pageNumber,
-        pageSize,
-        ...filters,
-      };
-      
-      const response = await api.get('/jobs', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params,
-      });
+      const response = await api.get(`/jobs?${queryString}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch jobs');
@@ -74,10 +60,10 @@ const jobSlice = createSlice({
       state.error = null;
     },
     setPageNumber: (state, action) => {
-      state.pageNumber = action.payload;
+      state.pagination.pageNumber = action.payload;
     },
     setPageSize: (state, action) => {
-      state.pageSize = action.payload;
+      state.pagination.pageSize = action.payload;
     },
     updateFilter: (state, action) => {
       state.filters = {
@@ -108,11 +94,11 @@ const jobSlice = createSlice({
       .addCase(fetchJobs.fulfilled, (state, action) => {
         state.loading = false;
         state.jobs = action.payload.content;
-        state.totalElements = action.payload.totalElements;
-        state.totalPages = action.payload.totalPages;
-        state.pageNumber = action.payload.pageNumber;
-        state.pageSize = action.payload.pageSize;
-        state.lastPage = action.payload.lastPage;
+        state.pagination.totalElements = action.payload.totalElements;
+        state.pagination.totalPages = action.payload.totalPages;
+        state.pagination.pageNumber = action.payload.pageNumber;
+        state.pagination.pageSize = action.payload.pageSize;
+        state.pagination.lastPage = action.payload.lastPage;
       })
       .addCase(fetchJobs.rejected, (state, action) => {
         state.loading = false;
