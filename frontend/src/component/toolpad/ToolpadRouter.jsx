@@ -86,8 +86,6 @@ function ToolpadRouter() {
         >
           <Routes>
             <Route path='' element={<Home/>}/>
-            <Route path='signin' element={<Signin />}/>
-            <Route path='signup' element={<Signup />}/>
             <Route path='jobs' element={<JobPage />}/>
             <Route path='favorites' element={<Favorite />}/>
           </Routes>
