@@ -25,4 +25,6 @@ public interface JobService {
     String deleteJob(Long id);
 
     void searchJob(SearchRequestBody searchRequestBody);
+
+
 }
