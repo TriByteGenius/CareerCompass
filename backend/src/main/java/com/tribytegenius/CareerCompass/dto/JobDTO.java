@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobDTO {
+    private String id;
     private String name;
     private String company;
     private String type;
