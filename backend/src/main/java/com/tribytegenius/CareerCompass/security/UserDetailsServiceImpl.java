@@ -14,6 +14,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
+    /**
+     * Loads a user by email. Despite the method name referring to "username",
+     * we use email as our principal identifier for authentication.
+     */
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) {
