@@ -4,7 +4,9 @@ import com.tribytegenius.CareerCompass.config.AppConstants;
 import com.tribytegenius.CareerCompass.dto.JobDTO;
 import com.tribytegenius.CareerCompass.dto.JobResponse;
 import com.tribytegenius.CareerCompass.dto.SearchRequestBody;
+import com.tribytegenius.CareerCompass.model.User;
 import com.tribytegenius.CareerCompass.service.JobService;
+import com.tribytegenius.CareerCompass.util.AuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ import java.util.List;
 public class JobController {
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private AuthUtil authUtil;
 
     @GetMapping
     public ResponseEntity<JobResponse> getAllJobs(

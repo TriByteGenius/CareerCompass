@@ -132,8 +132,7 @@ public class AuthController {
                 user.getId(),
                 user.getUserName(),
                 user.getEmail(),
-                roles,
-                user.getFavoriteJobs()
+                roles
         );
 
         return ResponseEntity.ok().body(userDTO);

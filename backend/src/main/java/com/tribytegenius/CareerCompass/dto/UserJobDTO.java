@@ -9,14 +9,12 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobDTO {
-    private String id;
-    private String name;
-    private String company;
-    private String type;
-    private String location;
-    private LocalDateTime time;
+public class UserJobDTO {
+    private Long id;
+    private Long userId;
+    private String userName;
+    private JobDTO job;
     private String status;
-    private String url;
-    private String website;
+    private LocalDateTime statusChangedAt;
 }
+
