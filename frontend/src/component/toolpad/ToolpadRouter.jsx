@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../redux/slices/authSlice';
+import { logout, getCurrentUser } from '../../redux/slices/authSlice';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast';
 import Theme from './Theme'
 import Navigation from './Navigation';
 import AppTitle from './AppTitle';
@@ -20,7 +21,7 @@ import Signup from '../auth/Signup'
 function ToolpadRouter() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector(state => state.auth);
+  const { user, isAuthenticated, token } = useSelector(state => state.auth);
   const [signinOpen, setSigninOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
   
@@ -38,6 +39,7 @@ function ToolpadRouter() {
     },
     signOut: () => {
       dispatch(logout());
+      toast.success("You have been logged out successfully");
       navigate('/');
     }
   };
@@ -59,6 +61,12 @@ function ToolpadRouter() {
   const closeSignup = () => {
     setSignupOpen(false);
   };
+
+  useEffect(() => {
+    if (token && !user) {
+      dispatch(getCurrentUser());
+    }
+  }, [dispatch, token, user]);
 
   return (
     <>

@@ -1,18 +1,40 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import useJobFilter from '../hooks/useJobFilter';
-import { fetchJobs } from '../../redux/slices/jobSlice';
+import { getFavoriteJobs } from '../../redux/slices/favoriteSlice';
 import { Grid, Box, Typography, Container, CircularProgress, Alert } from '@mui/material';
 import Filter from './Filter';
 import JobCard from './JobCard';
 import Paginations from './Paginations';
 import WorkIcon from '@mui/icons-material/Work';
 
+// Helper function to check if a job is in favorites
+const isJobFavorited = (favoriteJobs = [], jobId) => {
+  if (!Array.isArray(favoriteJobs) || !jobId) return false;
+  return favoriteJobs.some(item => item.job?.id === jobId);
+};
+
+// Helper function to get job status from favorites
+const getJobStatus = (favoriteJobs = [], jobId) => {
+  if (!Array.isArray(favoriteJobs) || !jobId) return 'new';
+  const favoriteJob = favoriteJobs.find(item => item.job?.id === jobId);
+  return favoriteJob?.status || 'new';
+};
+
 const JobPage = () => {
   useJobFilter();
   const dispatch = useDispatch();
   const { jobs, loading, error } = useSelector(state => state.job);
   const { pageNumber, pageSize, totalElements, totalPages } = useSelector(state => state.job.pagination);
+  const { isAuthenticated } = useSelector(state => state.auth);
+  const { favoriteJobs } = useSelector(state => state.favorites);
+
+  // Fetch favorite jobs only when the user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getFavoriteJobs());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return (
     <Container maxWidth="lg">
@@ -24,7 +46,7 @@ const JobPage = () => {
         </Typography>
 
         {/* Filter */}
-        <Box sx={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'white', py: 2, mb: 3 }}>
+        <Box sx={{ top: 0, zIndex: 10, py: 2, mb: 3 }}>
           <Filter />
         </Box>
 
@@ -51,9 +73,15 @@ const JobPage = () => {
 
         {/* Job cards grid */}
         <Grid container spacing={3}>
-          {jobs && jobs.map((job, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <JobCard {...job} />
+          {jobs && jobs.map((job) => (
+            <Grid item xs={12} md={6} key={job.id}>
+              <JobCard 
+                {...job} 
+                // Check if this job is favorited
+                isFavorite={isJobFavorited(favoriteJobs, job.id)}
+                // Explicitly set showApplicationStatus to false to hide the application status button
+                showApplicationStatus={false}
+              />
             </Grid>
           ))}
         </Grid>
@@ -68,9 +96,7 @@ const JobPage = () => {
         {/* Fixed position pagination */}
         {totalPages > 0 && (
           <Box sx={{ 
-            position: 'sticky', 
             bottom: 0, 
-            backgroundColor: 'white', 
             py: 2, 
             mt: 3,
             display: 'flex',

@@ -9,7 +9,6 @@ import {
   Box,
   InputAdornment,
   TextField,
-  Paper
 } from "@mui/material";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -18,6 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from 'react-hot-toast';
 
 const Filter = () => {
   const [searchParams] = useSearchParams();
@@ -66,8 +66,10 @@ const Filter = () => {
 
     if (selectedWebsite === "all") {
       params.delete("website");
+      toast.success("Showing jobs from all websites");
     } else {
       params.set("website", selectedWebsite);
+      toast.success(`Showing jobs from ${selectedWebsite}`);
     }
     navigate(`${pathname}?${params}`);
     setWebsite(selectedWebsite);
@@ -78,8 +80,10 @@ const Filter = () => {
 
     if (selectedStatus === "all") {
       params.delete("status");
+      toast.success("Showing jobs with all statuses");
     } else {
       params.set("status", selectedStatus);
+      toast.success(`Filtering jobs with status: ${selectedStatus}`);
     }
     navigate(`${pathname}?${params}`);
     setStatus(selectedStatus);
@@ -90,8 +94,13 @@ const Filter = () => {
 
     if (selectedTimeInDays === "all") {
       params.delete("timeInDays");
+      toast.success("Showing jobs from all time periods");
     } else {
       params.set("timeInDays", selectedTimeInDays);
+      let timeMessage = "Last 24 hours";
+      if (selectedTimeInDays === "7") timeMessage = "Last week";
+      if (selectedTimeInDays === "30") timeMessage = "Last month";
+      toast.success(`Showing jobs from: ${timeMessage}`);
     }
     navigate(`${pathname}?${params}`);
     setTimeInDays(selectedTimeInDays);
@@ -101,144 +110,144 @@ const Filter = () => {
     setSortOrder((prevOrder) => {
       const newOrder = (prevOrder === "asc") ? "desc" : "asc";
       params.set("sortby", newOrder);
+      toast.success(`Sorting jobs by date: ${newOrder === "asc" ? "Oldest first" : "Newest first"}`);
       navigate(`${pathname}?${params}`);
       return newOrder;
     });
   };
 
   const handleClearFilters = () => {
+    toast.success("All filters cleared");
     navigate(pathname);
   };
 
   return (
-    <Paper elevation={0}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          gap: 2
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 2
+      }}
+    >
+      {/* Search Field */}
+      <TextField
+        placeholder="Search Jobs/Companies/Locations"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        variant="outlined"
+        size="small"
+        sx={{ 
+          width: { xs: '100%', sm: '320px' },
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 1,
+            height: '40px'
+          }
         }}
-      >
-        {/* Search Field */}
-        <TextField
-          placeholder="Search Jobs"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          variant="outlined"
-          size="small"
-          sx={{ 
-            width: { xs: '100%', sm: '220px' },
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 1,
-              height: '40px'
-            }
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-        {/* Website Selection */}
-        <FormControl size="small" sx={{ width: { xs: '100%', sm: '120px' } }}>
-          <InputLabel id="website-select-label">Website</InputLabel>
-          <Select
-            labelId="website-select-label"
-            value={website}
-            onChange={handleWebsiteChange}
-            label="Website"
-            sx={{ height: '40px' }}
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="LINKEDIN">LinkedIn</MenuItem>
-            <MenuItem value="INDEED">Indeed</MenuItem>
-            <MenuItem value="IRISHJOBS">Irish Jobs</MenuItem>
-            <MenuItem value="JOBS">Jobs.ie</MenuItem>
-          </Select>
-        </FormControl>
+      {/* Website Selection */}
+      <FormControl size="small" sx={{ width: { xs: '100%', sm: '120px' } }}>
+        <InputLabel id="website-select-label">Website</InputLabel>
+        <Select
+          labelId="website-select-label"
+          value={website}
+          onChange={handleWebsiteChange}
+          label="Website"
+          sx={{ height: '40px' }}
+        >
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="LINKEDIN">LinkedIn</MenuItem>
+          <MenuItem value="INDEED">Indeed</MenuItem>
+          <MenuItem value="IRISHJOBS">Irish Jobs</MenuItem>
+          <MenuItem value="JOBS">Jobs.ie</MenuItem>
+        </Select>
+      </FormControl>
 
-        {/* Status Selection */}
-        <FormControl size="small" sx={{ width: { xs: '100%', sm: '120px' } }}>
-          <InputLabel id="status-select-label">Status</InputLabel>
-          <Select
-            labelId="status-select-label"
-            value={status}
-            onChange={handleStatusChange}
-            label="Status"
-            sx={{ height: '40px' }}
-            startAdornment={
-              <InputAdornment position="start">
-                <FilterListIcon fontSize="small" />
-              </InputAdornment>
-            }
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="new">New</MenuItem>
-            <MenuItem value="applied">Applied</MenuItem>
-            <MenuItem value="interview">Interview</MenuItem>
-            <MenuItem value="rejected">Rejected</MenuItem>
-            <MenuItem value="offer">Offer</MenuItem>
-          </Select>
-        </FormControl>
+      {/* Status Selection */}
+      <FormControl size="small" sx={{ width: { xs: '100%', sm: '120px' } }}>
+        <InputLabel id="status-select-label">Status</InputLabel>
+        <Select
+          labelId="status-select-label"
+          value={status}
+          onChange={handleStatusChange}
+          label="Status"
+          sx={{ height: '40px' }}
+          startAdornment={
+            <InputAdornment position="start">
+              <FilterListIcon fontSize="small" />
+            </InputAdornment>
+          }
+        >
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="new">New</MenuItem>
+          <MenuItem value="applied">Applied</MenuItem>
+          <MenuItem value="interview">Interview</MenuItem>
+          <MenuItem value="rejected">Rejected</MenuItem>
+          <MenuItem value="offer">Offer</MenuItem>
+        </Select>
+      </FormControl>
 
-        {/* Time Period Selection */}
-        <FormControl size="small" sx={{ width: { xs: '100%', sm: '150px' } }}>
-          <InputLabel id="time-select-label">Time Period</InputLabel>
-          <Select
-            labelId="time-select-label"
-            value={timeInDays}
-            onChange={handleTimeInDaysChange}
-            label="Time Period"
-            sx={{ height: '40px' }}
-            startAdornment={
-              <InputAdornment position="start">
-                <CalendarMonthIcon fontSize="small" />
-              </InputAdornment>
-            }
-          >
-            <MenuItem value="all">All Time</MenuItem>
-            <MenuItem value="1">Last 24 Hours</MenuItem>
-            <MenuItem value="7">Last Week</MenuItem>
-            <MenuItem value="30">Last Month</MenuItem>
-          </Select>
-        </FormControl>
+      {/* Time Period Selection */}
+      <FormControl size="small" sx={{ width: { xs: '100%', sm: '150px' } }}>
+        <InputLabel id="time-select-label">Time Period</InputLabel>
+        <Select
+          labelId="time-select-label"
+          value={timeInDays}
+          onChange={handleTimeInDaysChange}
+          label="Time Period"
+          sx={{ height: '40px' }}
+          startAdornment={
+            <InputAdornment position="start">
+              <CalendarMonthIcon fontSize="small" />
+            </InputAdornment>
+          }
+        >
+          <MenuItem value="all">All Time</MenuItem>
+          <MenuItem value="1">Last 24 Hours</MenuItem>
+          <MenuItem value="7">Last Week</MenuItem>
+          <MenuItem value="30">Last Month</MenuItem>
+        </Select>
+      </FormControl>
 
-        {/* Sort Button */}
-        <Tooltip title={`Sorted by date: ${sortOrder}`}>
-          <Button 
-            variant="contained" 
-            onClick={toggleSortOrder}
-            startIcon={sortOrder === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-            sx={{ 
-              height: '40px',
-              width: { xs: '100%', sm: 'auto' },
-              minWidth: '120px' 
-            }}
-          >
-            Sort By
-          </Button>
-        </Tooltip>
-
-        {/* Clear Filter Button */}
+      {/* Sort Button */}
+      <Tooltip title={`Sorted by date: ${sortOrder}`}>
         <Button 
           variant="contained" 
-          color="error"
-          startIcon={<RefreshIcon />}
-          onClick={handleClearFilters}
+          onClick={toggleSortOrder}
+          startIcon={sortOrder === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
           sx={{ 
             height: '40px',
             width: { xs: '100%', sm: 'auto' },
-            minWidth: '120px'
+            minWidth: '120px' 
           }}
         >
-          Clear Filter
+          Sort By
         </Button>
-      </Box>
-    </Paper>
+      </Tooltip>
+
+      {/* Clear Filter Button */}
+      <Button 
+        variant="contained" 
+        color="error"
+        startIcon={<RefreshIcon />}
+        onClick={handleClearFilters}
+        sx={{ 
+          height: '40px',
+          width: { xs: '100%', sm: 'auto' },
+          minWidth: '120px'
+        }}
+      >
+        Clear Filter
+      </Button>
+    </Box>
   );
 };
 

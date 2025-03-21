@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleFavorite, updateJobStatus } from '../../redux/slices/favoriteSlice';
 import { 
   Card, 
   CardContent, 
@@ -7,8 +9,15 @@ import {
   Chip, 
   Box,
   Stack,
-  Divider
+  Divider,
+  CircularProgress,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
+import getFreshnessBanner from '../../util/getFreshness';
+import formatDate from '../../util/formatDate';
 import WorkIcon from '@mui/icons-material/Work';
 import BusinessIcon from '@mui/icons-material/Business';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -19,33 +28,21 @@ import IndeedIcon from '@mui/icons-material/Description';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import SendIcon from '@mui/icons-material/Send';
+import CancelIcon from '@mui/icons-material/Cancel';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import toast from 'react-hot-toast';
 
-// Helper function to determine badge color and text based on freshness
-const getFreshnessBanner = (timeString) => {
-  if (!timeString) {
-    return { color: '#e0e0e0', text: 'Unknown date' };
-  }
-  
-  try {
-    const jobDate = new Date(timeString);
-    const now = new Date();
-    const diffTime = Math.abs(now - jobDate);
-    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffHours < 24) {
-      return { color: '#4caf50', text: 'Just Posted', textColor: 'white' }; // Green
-    } else if (diffDays < 3) {
-      return { color: '#2196f3', text: `${diffDays}d ago`, textColor: 'white' }; // Blue
-    } else if (diffDays < 7) { 
-      return { color: '#ff9800', text: `${diffDays}d ago`, textColor: 'white' }; // Orange
-    } else {
-      return { color: '#757575', text: `${diffDays}d ago`, textColor: 'white' }; // Gray
-    }
-  } catch (error) {
-    return { color: '#e0e0e0', text: 'Unknown date', textColor: 'black' };
-  }
-};
+// Status options with icons and colors
+const statusOptions = [
+  { value: 'new', label: 'New', icon: <CheckCircleIcon />, color: 'success' },
+  { value: 'applied', label: 'Applied', icon: <SendIcon />, color: 'primary' },
+  { value: 'interview', label: 'Interview', icon: <WorkIcon />, color: 'info' },
+  { value: 'offer', label: 'Offer', icon: <EmojiEventsIcon />, color: 'warning' },
+  { value: 'rejected', label: 'Rejected', icon: <CancelIcon />, color: 'error' },
+];
 
 // Get website icon based on website name
 const getWebsiteIcon = (website) => {
@@ -59,42 +56,86 @@ const getWebsiteIcon = (website) => {
   }
 };
 
-// Format date for display,transform iso to user friendly format
-const formatDate = (timeString) => {
-  if (!timeString) return 'Unknown date';
-  
-  try {
-    const date = new Date(timeString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit', 
-      minute: '2-digit', 
-      hour12: true
-    }).format(date);
-  } catch (error) {
-    return 'Unknown date';
-  }
-};
-
-// This function would be implemented later to add/remove job from favorites
-const handleToggleFavorite = () => {
-  console.log("Toggle favorite for job:", name);
+// Get status option info by value
+const getStatusOption = (statusValue) => {
+  return statusOptions.find(option => option.value === statusValue) || statusOptions[0];
 };
 
 const JobCard = ({ 
+  id,
   name, 
   company, 
   type, 
   location, 
   time, 
-  status, 
+  status = 'new', 
+  applicationStatus = 'new',
   url, 
   website,
-  isFavorite = false
+  isFavorite = false,
+  showApplicationStatus,
 }) => {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector(state => state.auth);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const freshness = getFreshnessBanner(time);
+  
+  // Find current status option
+  const currentStatus = getStatusOption(applicationStatus);
+
+  const handleToggleFavorite = async () => {
+    // Prevent API calls if user is not authenticated
+    if (!isAuthenticated) {
+      toast.error('Please sign in to save jobs to favorites');
+      return;
+    }
+
+    setFavoriteLoading(true);
+    try {
+      await dispatch(toggleFavorite(id)).unwrap();
+      toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites');
+    } catch (error) {
+      toast.error(error || 'Failed to update favorites');
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
+  // Handle opening status menu
+  const handleStatusClick = (event) => {
+    if (!isAuthenticated) {
+      toast.error('Please sign in to update job status');
+      return;
+    }
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Handle closing status menu
+  const handleStatusClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Handle selecting a new status
+  const handleStatusChange = async (newStatus) => {
+    if (newStatus === applicationStatus) {
+      handleStatusClose();
+      return;
+    }
+
+    setStatusLoading(true);
+    try {
+      await dispatch(updateJobStatus({ jobId: id, status: newStatus })).unwrap();
+      toast.success(`Status updated to ${newStatus}`);
+    } catch (error) {
+      toast.error(error || 'Failed to update status');
+    } finally {
+      setStatusLoading(false);
+      handleStatusClose();
+    }
+  };
+
   return (
     <Card 
       elevation={2} 
@@ -116,7 +157,7 @@ const JobCard = ({
             alignItems: 'center', 
             justifyContent: 'space-between',
             p: 2,
-            bgcolor: '#f5f5f5' 
+            bgcolor: 'text.disabled'
           }}
         >
           <Stack direction="row" spacing={1} alignItems="center">
@@ -141,13 +182,13 @@ const JobCard = ({
         {/* Main job details */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>
-            {name || 'Job Position'}
+            {name || 'Job Name'}
           </Typography>
           
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
             <WorkIcon fontSize="small" color="action" />
             <Typography variant="body2" color="text.secondary">
-              {type || 'Position Type'}
+              {type || 'Job Type'}
             </Typography>
           </Stack>
           
@@ -155,7 +196,7 @@ const JobCard = ({
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
               <LocationOnIcon fontSize="small" color="action" />
               <Typography variant="body2" color="text.secondary">
-                {location}
+                {location || 'Job Location'}
               </Typography>
             </Stack>
           )}
@@ -169,7 +210,8 @@ const JobCard = ({
         </Box>
 
         {/* Status and freshness badges */}
-        <Stack direction="row" spacing={1} sx={{ my: 2 }}>
+        <Stack direction="row" spacing={1} sx={{ my: 2 }} alignItems="center">
+          {/* Freshness badge - always shown */}
           <Chip
             label={freshness.text}
             size="small"
@@ -179,7 +221,7 @@ const JobCard = ({
               fontWeight: 'bold'
             }}
           />
-          
+
           {status && (
             <Chip
               label={status}
@@ -188,6 +230,41 @@ const JobCard = ({
               variant="outlined"
             />
           )}
+          
+          {/* Only show application status button in Favorites page */}
+          {showApplicationStatus && (
+            <Button
+              variant="outlined"
+              size="small"
+              color={currentStatus.color}
+              onClick={handleStatusClick}
+              startIcon={statusLoading ? <CircularProgress size={16} /> : currentStatus.icon}
+              endIcon={<ArrowDropDownIcon />}
+              disabled={statusLoading || !isAuthenticated}
+            >
+              {currentStatus.label}
+            </Button>
+          )}
+          
+          {/* Status selection menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleStatusClose}
+          >
+            {statusOptions.map((option) => (
+              <MenuItem 
+                key={option.value} 
+                onClick={() => handleStatusChange(option.value)}
+                selected={applicationStatus === option.value}
+              >
+                <ListItemIcon>
+                  {React.cloneElement(option.icon, { color: option.color })}
+                </ListItemIcon>
+                <ListItemText>{option.label}</ListItemText>
+              </MenuItem>
+            ))}
+          </Menu>
         </Stack>
 
         <Divider sx={{ my: 2 }} />
@@ -198,8 +275,10 @@ const JobCard = ({
             variant="outlined"
             size="small"
             onClick={handleToggleFavorite}
-            startIcon={isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            startIcon={favoriteLoading ? <CircularProgress size={16} /> : 
+              (isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />)}
             color={isFavorite ? "error" : "primary"}
+            disabled={favoriteLoading}
           >
             {isFavorite ? "Saved" : "Save Job"}
           </Button>
