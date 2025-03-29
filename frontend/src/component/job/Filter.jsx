@@ -129,6 +129,7 @@ const Filter = () => {
         alignItems: 'center',
         gap: 2
       }}
+      data-testid="filter-container"
     >
       {/* Search Field */}
       <TextField
@@ -151,6 +152,7 @@ const Filter = () => {
             </InputAdornment>
           ),
         }}
+        data-testid="search-input"
       />
 
       {/* Website Selection */}
@@ -162,12 +164,13 @@ const Filter = () => {
           onChange={handleWebsiteChange}
           label="Website"
           sx={{ height: '40px' }}
+          data-testid="website-select"
         >
-          <MenuItem value="all">All</MenuItem>
-          <MenuItem value="LINKEDIN">LinkedIn</MenuItem>
-          <MenuItem value="INDEED">Indeed</MenuItem>
-          <MenuItem value="IRISHJOBS">Irish Jobs</MenuItem>
-          <MenuItem value="JOBS">Jobs.ie</MenuItem>
+          <MenuItem value="all" data-testid="website-option-all">All</MenuItem>
+          <MenuItem value="LINKEDIN" data-testid="website-option-linkedin">LinkedIn</MenuItem>
+          <MenuItem value="INDEED" data-testid="website-option-indeed">Indeed</MenuItem>
+          <MenuItem value="IRISHJOBS" data-testid="website-option-irishjobs">Irish Jobs</MenuItem>
+          <MenuItem value="JOBS" data-testid="website-option-jobs">Jobs.ie</MenuItem>
         </Select>
       </FormControl>
 
@@ -185,13 +188,14 @@ const Filter = () => {
               <FilterListIcon fontSize="small" />
             </InputAdornment>
           }
+          data-testid="status-select"
         >
-          <MenuItem value="all">All</MenuItem>
-          <MenuItem value="new">New</MenuItem>
-          <MenuItem value="applied">Applied</MenuItem>
-          <MenuItem value="interview">Interview</MenuItem>
-          <MenuItem value="rejected">Rejected</MenuItem>
-          <MenuItem value="offer">Offer</MenuItem>
+          <MenuItem value="all" data-testid="status-option-all">All</MenuItem>
+          <MenuItem value="new" data-testid="status-option-new">New</MenuItem>
+          <MenuItem value="applied" data-testid="status-option-applied">Applied</MenuItem>
+          <MenuItem value="interview" data-testid="status-option-interview">Interview</MenuItem>
+          <MenuItem value="rejected" data-testid="status-option-rejected">Rejected</MenuItem>
+          <MenuItem value="offer" data-testid="status-option-offer">Offer</MenuItem>
         </Select>
       </FormControl>
 
@@ -209,11 +213,12 @@ const Filter = () => {
               <CalendarMonthIcon fontSize="small" />
             </InputAdornment>
           }
+          data-testid="time-select"
         >
-          <MenuItem value="all">All Time</MenuItem>
-          <MenuItem value="1">Last 24 Hours</MenuItem>
-          <MenuItem value="7">Last Week</MenuItem>
-          <MenuItem value="30">Last Month</MenuItem>
+          <MenuItem value="all" data-testid="time-option-all">All Time</MenuItem>
+          <MenuItem value="1" data-testid="time-option-day">Last 24 Hours</MenuItem>
+          <MenuItem value="7" data-testid="time-option-week">Last Week</MenuItem>
+          <MenuItem value="30" data-testid="time-option-month">Last Month</MenuItem>
         </Select>
       </FormControl>
 
@@ -228,6 +233,7 @@ const Filter = () => {
             width: { xs: '100%', sm: 'auto' },
             minWidth: '120px' 
           }}
+          data-testid="sort-button"
         >
           Sort By
         </Button>
@@ -244,6 +250,7 @@ const Filter = () => {
           width: { xs: '100%', sm: 'auto' },
           minWidth: '120px'
         }}
+        data-testid="clear-filter-button"
       >
         Clear Filter
       </Button>

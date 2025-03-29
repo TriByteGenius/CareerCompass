@@ -36,6 +36,7 @@ const StatusFilter = ({ value, onChange, counts = {} }) => {
         borderBottom: 1,
         borderColor: 'divider'
       }}
+      data-testid="status-filter-container"
     >
       <Tabs
         value={value}
@@ -50,24 +51,26 @@ const StatusFilter = ({ value, onChange, counts = {} }) => {
             minWidth: isMobile ? 'auto' : 100,
           }
         }}
+        data-testid="status-tabs"
       >
         {statusTabs.map((tab) => (
           <Tab
             key={tab.value}
             value={tab.value}
             icon={tab.icon}
+            data-testid={`status-tab-${tab.value}`}
             label={
               counts[tab.value] ? (
                 <Badge
                   color="primary"
                   sx={{ mr: 1 }}
+                  data-testid={`badge-count-${tab.value}`}
                 >
                   {tab.label}
                 </Badge>
               ) : (
                 tab.label
-              )
-            }
+              )}
           />
         ))}
       </Tabs>

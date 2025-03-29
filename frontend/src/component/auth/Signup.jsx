@@ -64,6 +64,7 @@ const Signup = ({ open, onClose, openSignin }) => {
       onClose={handleClose}
       maxWidth="xs"
       fullWidth
+      data-testid="signup-dialog"
     >
       <DialogTitle>
         <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
@@ -72,7 +73,7 @@ const Signup = ({ open, onClose, openSignin }) => {
       </DialogTitle>
 
       <DialogContent sx={{ px: 6, pb: 4 }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} data-testid="signup-form">
           <TextField
             label="Username"
             variant="outlined"
@@ -91,6 +92,7 @@ const Signup = ({ open, onClose, openSignin }) => {
             })}
             error={!!errors.username}
             helperText={errors.username?.message}
+            data-testid="username-input"
           />
 
           <TextField
@@ -111,6 +113,7 @@ const Signup = ({ open, onClose, openSignin }) => {
             })}
             error={!!errors.email}
             helperText={errors.email?.message}
+            data-testid="email-input"
           />
 
           <TextField
@@ -132,6 +135,7 @@ const Signup = ({ open, onClose, openSignin }) => {
             })}
             error={!!errors.password}
             helperText={errors.password?.message}
+            data-testid="password-input"
           />
 
           <Button 
@@ -141,6 +145,7 @@ const Signup = ({ open, onClose, openSignin }) => {
             fullWidth 
             sx={{ mt: 3, mb: 2, py: 1.2 }}
             disabled={loading}
+            data-testid="signup-button"
           >
             {loading ? <CircularProgress size={24} /> : 'Sign Up'}
           </Button>
@@ -152,6 +157,7 @@ const Signup = ({ open, onClose, openSignin }) => {
             color="primary" 
             sx={{ p: 0, minWidth: 'auto', fontWeight: 'bold', textTransform: 'none' }}
             onClick={handleSigninClick}
+            data-testid="signin-link"
           >
             Sign In
           </Button>

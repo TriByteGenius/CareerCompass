@@ -25,7 +25,7 @@ const Home = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" data-testid="home-container">
       <Box sx={{ py: 6 }}>
         {/* Hero section */}
         <Paper 
@@ -37,8 +37,9 @@ const Home = () => {
             borderRadius: 2,
             color: 'white'
           }}
+          data-testid="hero-section"
         >
-          <Typography variant="h3" component="h1" gutterBottom fontWeight="bold">
+          <Typography variant="h3" component="h1" gutterBottom fontWeight="bold" data-testid="main-title">
             Welcome to CareerCompass
           </Typography>
           <Typography variant="h6" sx={{ mb: 3 }}>
@@ -51,18 +52,19 @@ const Home = () => {
             startIcon={<WorkIcon />}
             onClick={handleExploreJobs}
             sx={{ fontWeight: 'bold', px: 4, py: 1.5 }}
+            data-testid="explore-jobs-button"
           >
             Explore Jobs
           </Button>
         </Paper>
 
         {/* Feature Cards */}
-        <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 3 }} data-testid="features-title">
           Key Features
         </Typography>
-        <Grid container spacing={3} sx={{ mb: 6 }}>
+        <Grid container spacing={3} sx={{ mb: 6 }} data-testid="features-grid">
           <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
+            <Card sx={{ height: '100%' }} data-testid="feature-card-search">
               <CardContent>
                 <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
                   <SearchIcon color="primary" sx={{ fontSize: 48 }} />
@@ -77,7 +79,7 @@ const Home = () => {
             </Card>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
+            <Card sx={{ height: '100%' }} data-testid="feature-card-tracking">
               <CardContent>
                 <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
                   <FavoriteIcon color="primary" sx={{ fontSize: 48 }} />
@@ -92,7 +94,7 @@ const Home = () => {
             </Card>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
+            <Card sx={{ height: '100%' }} data-testid="feature-card-interface">
               <CardContent>
                 <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
                   <PeopleIcon color="primary" sx={{ fontSize: 48 }} />
@@ -109,7 +111,7 @@ const Home = () => {
         </Grid>
 
         {/* About Section */}
-        <Paper sx={{ p: 4, mb: 6, borderRadius: 2 }}>
+        <Paper sx={{ p: 4, mb: 6, borderRadius: 2 }} data-testid="about-section">
           <Typography variant="h4" component="h2" gutterBottom>
             About CareerCompass
           </Typography>
@@ -131,6 +133,7 @@ const Home = () => {
               href="https://github.com/TriByteGenius/CareerCompass"
               target="_blank"
               rel="noopener noreferrer"
+              data-testid="github-button"
             >
               View on GitHub
             </Button>
@@ -139,7 +142,7 @@ const Home = () => {
 
         {/* Footer */}
         <Divider sx={{ mb: 4 }} />
-        <Typography variant="body2" color="text.secondary" align="center">
+        <Typography variant="body2" color="text.secondary" align="center" data-testid="footer-text">
           © 2025 Developed by TriByteGenius
         </Typography>
       </Box>

@@ -55,10 +55,11 @@ const Favorite = () => {
   }, [favoriteJobs]);
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" data-testid="favorites-container">
       <Box sx={{ py: 3 }}>
         {/* Header */}
-        <Typography variant="h4" component="h1" sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, display: 'flex', alignItems: 'center' }}
+          data-testid="favorites-title">
           <FavoriteIcon sx={{ mr: 1, fontSize: 32, color: 'error.main' }} />
           Favorite Jobs
         </Typography>
@@ -74,21 +75,24 @@ const Favorite = () => {
 
         {/* Loading indicator */}
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}
+            data-testid="loading-indicator">
             <CircularProgress />
           </Box>
         )}
 
         {/* UnAuthenticated message */}
         {!isAuthenticated && (
-          <Alert severity="warning" sx={{ my: 4 }}>
+          <Alert severity="warning" sx={{ my: 4 }}
+            data-testid="unauthenticated-alert">
             {'You need to be logged in to view your favorites.'}
           </Alert>
         )}
 
         {/* No favorites message */}
         {!loading && isAuthenticated && (!favoriteJobs || favoriteJobs.length === 0) && (
-          <Alert severity="info" sx={{ my: 4 }}>
+          <Alert severity="info" sx={{ my: 4 }}
+            data-testid="no-favorites-alert">
             {currentTab === 'all' 
               ? 'You haven\'t saved any jobs to your favorites yet.' 
               : `You don't have any jobs with status "${currentTab}".`}
@@ -97,13 +101,14 @@ const Favorite = () => {
 
         {/* Job count */}
         {!loading && favoriteJobs && favoriteJobs.length > 0 && (
-          <Typography variant="body2" color="text.secondary" fontSize={'large'} sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" fontSize={'large'} sx={{ mb: 2 }}
+            data-testid="job-count">
             Found {favoriteJobs.length} {currentTab !== 'all' ? `${currentTab} ` : ''}jobs
           </Typography>
         )}
 
         {/* Favorite jobs grid */}
-        <Grid container spacing={3}>
+        <Grid container spacing={3} data-testid="favorites-grid">
           {favoriteJobs && favoriteJobs.map((favoriteJob) => (
             <Grid item xs={12} md={6} key={favoriteJob.id}>
               <JobCard 
