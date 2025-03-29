@@ -148,6 +148,7 @@ const JobCard = ({
           boxShadow: 6
         }
       }}
+      data-testid="job-card"
     >
       <Box sx={{ position: 'relative' }}>
         {/* Company and website banner */}
@@ -159,10 +160,12 @@ const JobCard = ({
             p: 2,
             bgcolor: 'text.disabled'
           }}
+          data-testid="company-banner"
         >
           <Stack direction="row" spacing={1} alignItems="center">
             <BusinessIcon fontSize="small" color="action" />
-            <Typography variant="subtitle1" fontWeight="bold" fontSize={"medium"} sx={{ mr: 1 }}>
+            <Typography variant="subtitle1" fontWeight="bold" fontSize={"medium"} sx={{ mr: 1 }}
+              data-testid="company-name">
               {company || 'Company'}
             </Typography>
           </Stack>
@@ -173,6 +176,7 @@ const JobCard = ({
               label={website}
               size="medium"
               variant="outlined"
+              data-testid="job-website"
             />
           )}
         </Box>
@@ -181,13 +185,13 @@ const JobCard = ({
       <CardContent sx={{ pt: 2 }}>
         {/* Main job details */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Typography variant="h6" fontWeight="bold" gutterBottom data-testid="job-title">
             {name || 'Job Name'}
           </Typography>
           
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
             <WorkIcon fontSize="small" color="action" />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" data-testid="job-type">
               {type || 'Job Type'}
             </Typography>
           </Stack>
@@ -195,7 +199,7 @@ const JobCard = ({
           {location && (
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
               <LocationOnIcon fontSize="small" color="action" />
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" data-testid="job-location">
                 {location || 'Job Location'}
               </Typography>
             </Stack>
@@ -203,7 +207,7 @@ const JobCard = ({
 
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
             <AccessTimeIcon fontSize="small" color="action" />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" data-testid="job-date">
               Posted: {formatDate(time)}
             </Typography>
           </Stack>
@@ -220,6 +224,7 @@ const JobCard = ({
               color: freshness.textColor,
               fontWeight: 'bold'
             }}
+            data-testid="freshness-badge"
           />
 
           {status && (
@@ -228,6 +233,7 @@ const JobCard = ({
               size="small"
               color={status.toLowerCase() === 'new' ? 'success' : 'default'}
               variant="outlined"
+              data-testid="status-badge"
             />
           )}
           
@@ -241,6 +247,7 @@ const JobCard = ({
               startIcon={statusLoading ? <CircularProgress size={16} /> : currentStatus.icon}
               endIcon={<ArrowDropDownIcon />}
               disabled={statusLoading || !isAuthenticated}
+              data-testid="status-button"
             >
               {currentStatus.label}
             </Button>
@@ -251,12 +258,14 @@ const JobCard = ({
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleStatusClose}
+            data-testid="status-menu"
           >
             {statusOptions.map((option) => (
               <MenuItem 
                 key={option.value} 
                 onClick={() => handleStatusChange(option.value)}
                 selected={applicationStatus === option.value}
+                data-testid={`status-option-${option.value}`}
               >
                 <ListItemIcon>
                   {React.cloneElement(option.icon, { color: option.color })}
@@ -279,6 +288,7 @@ const JobCard = ({
               (isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />)}
             color={isFavorite ? "error" : "primary"}
             disabled={favoriteLoading}
+            data-testid="favorite-button"
           >
             {isFavorite ? "Saved" : "Save Job"}
           </Button>
@@ -289,6 +299,7 @@ const JobCard = ({
             size="small" 
             endIcon={<LaunchIcon />}
             onClick={() => window.open(url, '_blank')}
+            data-testid="apply-button"
           >
             Apply Now
           </Button>

@@ -62,6 +62,7 @@ const Signin = ({ open, onClose, openSignup }) => {
       onClose={handleClose}
       maxWidth="xs"
       fullWidth
+      data-testid="signin-dialog"
     >
       <DialogTitle>
         <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
@@ -70,7 +71,7 @@ const Signin = ({ open, onClose, openSignup }) => {
       </DialogTitle>
 
       <DialogContent sx={{ px: 6, pb: 4 }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} data-testid="signin-form">
           <TextField
             label="Email"
             variant="outlined"
@@ -85,6 +86,7 @@ const Signin = ({ open, onClose, openSignup }) => {
             })}
             error={!!errors.email}
             helperText={errors.email?.message}
+            data-testid="email-input"
           />
 
           <TextField
@@ -106,6 +108,7 @@ const Signin = ({ open, onClose, openSignup }) => {
             })}
             error={!!errors.password}
             helperText={errors.password?.message}
+            data-testid="password-input"
           />
 
           <Button 
@@ -115,6 +118,7 @@ const Signin = ({ open, onClose, openSignup }) => {
             fullWidth 
             sx={{ mt: 3, mb: 2, py: 1.2 }}
             disabled={loading}
+            data-testid="signin-button"
           >
             {loading ? <CircularProgress size={24} /> : 'Sign In'}
           </Button>
@@ -126,6 +130,7 @@ const Signin = ({ open, onClose, openSignup }) => {
             color="primary" 
             sx={{ p: 0, minWidth: 'auto', fontWeight: 'bold', textTransform: 'none' }}
             onClick={handleSignupClick}
+            data-testid="signup-link"
           >
             Sign Up
           </Button>

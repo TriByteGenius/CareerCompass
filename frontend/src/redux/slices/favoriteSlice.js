@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { logout } from '../slices/authSlice';
 import api from '../../api/api';
-import { toast } from 'react-hot-toast';
 
 const initialState = {
   favoriteJobs: [],

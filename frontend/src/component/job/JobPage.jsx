@@ -37,42 +37,45 @@ const JobPage = () => {
   }, [dispatch, isAuthenticated]);
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" data-testid="jobs-container">
       <Box sx={{ py: 3 }}>
         {/* Header */}
-        <Typography variant="h4" component="h1" sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, display: 'flex', alignItems: 'center' }}
+          data-testid="jobs-title">
           <WorkIcon sx={{ mr: 1, fontSize: 32 }} />
           Job Listings
         </Typography>
 
         {/* Filter */}
-        <Box sx={{ top: 0, zIndex: 10, py: 2, mb: 3 }}>
+        <Box sx={{ top: 0, zIndex: 10, py: 2, mb: 3 }} data-testid="filter-section">
           <Filter />
         </Box>
 
         {/* Loading indicator */}
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}
+            data-testid="loading-indicator">
             <CircularProgress />
           </Box>
         )}
 
         {/* Error message */}
         {error && (
-          <Alert severity="error" sx={{ my: 2 }}>
+          <Alert severity="error" sx={{ my: 2 }} data-testid="error-alert">
             {error}
           </Alert>
         )}
 
         {/* Job count */}
         {!loading && jobs && (
-          <Typography variant="body2" color="text.secondary" fontSize={'large'} sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" fontSize={'large'} sx={{ mb: 2 }}
+            data-testid="job-count">
             Found {totalElements || jobs.length} jobs
           </Typography>
         )}
 
         {/* Job cards grid */}
-        <Grid container spacing={3}>
+        <Grid container spacing={3} data-testid="jobs-grid">
           {jobs && jobs.map((job) => (
             <Grid item xs={12} md={6} key={job.id}>
               <JobCard 
@@ -88,7 +91,7 @@ const JobPage = () => {
 
         {/* No jobs message */}
         {!loading && (!jobs || jobs.length === 0) && (
-          <Alert severity="info" sx={{ my: 4 }}>
+          <Alert severity="info" sx={{ my: 4 }} data-testid="no-jobs-alert">
             No jobs found. Try adjusting your search filters.
           </Alert>
         )}
@@ -102,7 +105,8 @@ const JobPage = () => {
             display: 'flex',
             justifyContent: 'center',
             borderTop: '1px solid #eee'
-          }}>
+          }}
+          data-testid="pagination-container">
             <Paginations numberOfPage={totalPages} />
           </Box>
         )}

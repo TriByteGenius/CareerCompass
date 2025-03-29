@@ -21,7 +21,8 @@ const Paginations = ({ numberOfPage }) => {
       siblingCount={0} 
       boundaryCount={2} 
       shape="rounded" 
-      onChange = {onChangeHandler}
+      onChange={onChangeHandler}
+      data-testid="pagination-component"
     />
   )
 };

@@ -74,19 +74,23 @@ function ToolpadRouter() {
         open={signinOpen} 
         onClose={closeSignin} 
         openSignup={openSignup} 
+        data-testid="signin-dialog"
       />
       <Signup
         open={signupOpen} 
         onClose={closeSignup} 
-        openSignin={openSignin} 
+        openSignin={openSignin}
+        data-testid="signup-dialog" 
       />
       <ReactRouterAppProvider
         navigation={Navigation}
         theme={Theme}
         session={session}
         authentication={authentication}
+        data-testid="router-provider"
       >
         <DashboardLayout
+          data-testid="dashboard-layout"
           slots={{
             appTitle: AppTitle,
             sidebarFooter: SidebarFooter,
