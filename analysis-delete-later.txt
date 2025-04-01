@@ -1,0 +1,13 @@
+front-end:
+api->jobSlice(fetchJobs,searchJobs)->hooks/useJobFilter->job/jobpage
+
+fetchJobs:
+keywords, websites, status, time
+
+searchJobs:
+    private String website;
+    private List<String> type;
+    private String location;
+    private int time;
+
+only thins diference is location.

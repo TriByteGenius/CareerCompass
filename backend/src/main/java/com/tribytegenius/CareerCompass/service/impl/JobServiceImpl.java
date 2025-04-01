@@ -155,6 +155,8 @@ public class JobServiceImpl implements JobService {
             .bodyToMono(Void.class)
             .onErrorResume(e -> {
                 return Mono.error(new RuntimeException("Failed to call pythonServiceClient: " + e.getMessage()));
-            });
+            })
+            .subscribe();
     }
+
 }
