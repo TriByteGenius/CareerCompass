@@ -37,8 +37,34 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private ModelMapper modelMapper;
 
+
     @Override
     public JobResponse getAllJobs(
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortOrder,
+            String keyword,
+            String status,
+            String website,
+            Integer timeInDays
+    ) {
+        try {
+            searchJob(new SearchRequestBody(
+                website != null ? website :"LINKEDIN",
+                keyword != null ? List.of(keyword) : List.of("Software Engineer"), 
+                "Ireland", 
+                timeInDays != null ? timeInDays: 1 ));
+        } catch (Exception e) {
+            System.err.println("Warning: searchJob failed, proceeding with database-only results. Error: " + e.getMessage());
+        }
+        // this function log the error rather than return the error, 
+        // means that even there are some error happend, the getAllJobsOld() will still excute.
+        // this because the quota limits of google search api and easily run out
+        return getAllJobsOld(pageNumber, pageSize, sortBy, sortOrder, keyword, status, website, timeInDays);
+    }
+
+    public JobResponse getAllJobsOld(
             Integer pageNumber,
             Integer pageSize,
             String sortBy,
