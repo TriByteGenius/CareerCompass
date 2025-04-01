@@ -15,6 +15,6 @@ app = FastAPI()
 def test():
     return "Python engineer test ok!"
 
-@app.get("/update")
+@app.post("/update")
 def get_index(request: JobUpdateRequestSchema, db: Session = Depends(get_db)):
     return update_jobs(request, db)
