@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-engine
+  template:
+    metadata:
+      labels:
+        app: python-engine
+    spec:
+      containers:
+        - name: python-engine
+          image: python-engine
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "postgres://postgres:mysecretpassword@postgres:5432/mydb"  # PostgreSQL URL for Python app
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-engine
+spec:
+  selector:
+    app: python-engine
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
