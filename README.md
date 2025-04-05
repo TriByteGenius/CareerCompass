@@ -23,7 +23,7 @@ Try our application here:
 - **Testing:** Vitest 3.0.9, React Testing Library 16.2.0
 
 ### Backend
-- **Java API:** Spring Boot 3.x
+- **Java API:** Spring Boot 3.4.3
     - **Security:** Spring Security with JWT
     - **Database:** PostgreSQL with JPA/Hibernate, RDS for cloud deployment
     - **Testing:** JUnit, Mockito
