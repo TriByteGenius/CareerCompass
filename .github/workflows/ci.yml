@@ -75,23 +75,34 @@ jobs:
     #     ./mvnw test
 
     ### React Frontend ###
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+    # - name: Set up Node.js
+    #   uses: actions/setup-node@v3
+    #   with:
+    #     node-version: '18'
 
-    - name: Install frontend dependencies
-      working-directory: ./frontend
-      run: npm install
+    # - name: Install frontend dependencies
+    #   working-directory: ./frontend
+    #   run: npm install
       
     - name: Run React tests
       working-directory: ./frontend
       run: npm test
 
+    # - name: deploy frontend
+    #   working-directory: ./frontend
+    #   run: echo "deploy frontend"
 
-    
+    - name: Build and Push Python-engine Images
+      working-directory: ./python-service
+      run: |
+        docker build -t andyg2025/python-engine:$VERSION .
+        docker push andyg2025/python-engine:$VERSION .
 
-  
+    - name: Build and Push spring backend Images
+      working-directory: ./backend
+      run: |
+        ./mvnw clean package -DskipTests && docker build -t andyg2025/backend:$VERSION .
+        docker push andyg2025/backend:$VERSION .
 
 
     # - name: Checkout other repositories
