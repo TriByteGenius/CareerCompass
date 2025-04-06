@@ -20,9 +20,6 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    @Autowired
-    private AuthUtil authUtil;
-
     @GetMapping
     public ResponseEntity<JobResponse> getAllJobs(
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -45,6 +42,14 @@ public class JobController {
                 timeInDays
         );
         return new ResponseEntity<>(jobResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/update")
+    public ResponseEntity<String> getNewJobs(
+            @RequestParam(name = "keyword", required = false) String keyword
+    ){
+        String status = jobService.getNewJobs(keyword);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     @PostMapping

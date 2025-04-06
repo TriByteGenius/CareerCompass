@@ -37,17 +37,16 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private ModelMapper modelMapper;
 
-
     @Override
     public String getNewJobs(
             String keyword
     ) {
         try {
             searchJob(new SearchRequestBody(
-                "LINKEDIN",
-                keyword != null ? List.of(keyword) : List.of("Software Engineer"), 
-                "Ireland", 
-                1 ));
+                    "LINKEDIN",
+                    keyword != null ? List.of(keyword) : List.of("Software Engineer"),
+                    "Ireland",
+                    1));
         } catch (Exception e) {
             System.err.println("Warning: searchJob failed, proceeding with database-only results. Error: " + e.getMessage());
         }
@@ -154,4 +153,27 @@ public class JobServiceImpl implements JobService {
         existingJob.setUrl(jobDTO.getUrl());
         existingJob.setWebsite(jobDTO.getWebsite());
 
-        Job updatedJob = jobRepos
+        Job updatedJob = jobRepository.save(existingJob);
+        return modelMapper.map(updatedJob, JobDTO.class);
+    }
+
+    @Override
+    public String deleteJob(Long id) {
+        Job existingJob = jobRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Job", "id", id));
+        jobRepository.delete(existingJob);
+        return "Job deleted";
+    }
+
+    @Override
+    public void searchJob(SearchRequestBody searchRequestBody) {
+        pythonServiceClient.post()
+                .bodyValue(searchRequestBody)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .onErrorResume(e -> {
+                    return Mono.error(new RuntimeException("Failed to call pythonServiceClient: " + e.getMessage()));
+                })
+                .subscribe();
+    }
+}
