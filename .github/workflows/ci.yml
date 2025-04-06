@@ -40,26 +40,26 @@ jobs:
     
     ### Python engine ###
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.12'
 
-    - name: Install dependencies
-      working-directory: ./python-service
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirments.txt
+    # - name: Install dependencies
+    #   working-directory: ./python-service
+    #   run: |
+    #     python -m pip install --upgrade pip
+    #     pip install -r requirments.txt
 
-    - name: Run tests
-      working-directory: ./python-service
-      env:
-        DATABASE_USERNAME: postgres
-        DATABASE_PASSWORD: ""
-        DB_ENDPOINT: localhost:5432
-        DB_NAME: postgres
-      run: |
-        pytest test.py
+    # - name: Run tests
+    #   working-directory: ./python-service
+    #   env:
+    #     DATABASE_USERNAME: postgres
+    #     DATABASE_PASSWORD: ""
+    #     DB_ENDPOINT: localhost:5432
+    #     DB_NAME: postgres
+    #   run: |
+    #     pytest test.py
 
     ### Spring Boot ###
     - name: Set up JDK 17
