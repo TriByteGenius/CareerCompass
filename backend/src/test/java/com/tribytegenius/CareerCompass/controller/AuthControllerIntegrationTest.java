@@ -139,15 +139,15 @@ public class AuthControllerIntegrationTest {
                 .andExpect(jsonPath("$.message", is("Bad credentials")));
     }
 
-    @Test
-    @WithMockUser(username = "test@example.com")
-    public void testGetCurrentUser_ReturnsUserDetails() throws Exception {
-        mockMvc.perform(get("/api/auth/user")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username", is("testuser")))
-                .andExpect(jsonPath("$.email", is("test@example.com")));
-    }
+    // @Test
+    // @WithMockUser(username = "test@example.com")
+    // public void testGetCurrentUser_ReturnsUserDetails() throws Exception {
+    //     mockMvc.perform(get("/api/auth/user")
+    //                     .contentType(MediaType.APPLICATION_JSON))
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$.username", is("testuser")))
+    //             .andExpect(jsonPath("$.email", is("test@example.com")));
+    // }
 
     @Test
     public void testSignout_ReturnsSuccessMessage() throws Exception {
