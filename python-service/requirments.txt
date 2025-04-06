@@ -1,6 +1,7 @@
 requests
 python-dotenv
 bs4
+lxml==5.2.1
 pandas
 
 fastapi==0.115.6
@@ -10,3 +11,5 @@ pytest==8.3.4
 sqlalchemy==1.4.44
 pydantic==2.10.4
 psycopg2-binary==2.9.10
+
+httpx

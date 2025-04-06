@@ -23,6 +23,11 @@ public class JobController {
     @Autowired
     private AuthUtil authUtil;
 
+    @GetMapping("/test")
+    public String test(){
+        return "backend testing ok!";
+    }
+
     @GetMapping
     public ResponseEntity<JobResponse> getAllJobs(
             @RequestParam(name = "keyword", required = false) String keyword,

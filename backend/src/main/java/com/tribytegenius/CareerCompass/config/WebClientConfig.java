@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class WebClientConfig {
-    @Value("${USER_SERVICE_URL:http://localhost:8000/update}")
+    @Value("${PYTHON_ENGINE_URL:http://localhost:8000/update}")
     private String pythonServiceUrl;
 
     @Bean
