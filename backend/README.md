@@ -160,12 +160,17 @@ The project implements a robust CI/CD pipeline using GitHub Actions:
 
 ## 🖼️ Application Screenshots
 
-### Jobs interface
-- Job Browsing
-- Job Details
+### Home page
+![3](https://github.com/user-attachments/assets/70ea4b79-edb3-415d-9b31-99f8593f34ee)
 
-### User interface
-- Job Tracking
+### Job Browsing
+![1](https://github.com/user-attachments/assets/ccc77f07-bd70-48e8-900e-71a3eef38eb7)
+
+### Login page
+![4](https://github.com/user-attachments/assets/604fb236-c6dc-4722-b61b-04d6c72fbdd8)
+
+### Job Tracking
+![2](https://github.com/user-attachments/assets/f7b39ae9-f63b-4355-bf16-3db589256668)
 
 
 ## Contributors
