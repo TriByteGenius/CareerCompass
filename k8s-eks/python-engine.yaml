@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: python-engine
-          image: andyg2025/python-engine:v1
+          image: andyg2025/python-engine:v11
           ports:
             - containerPort: 8000
           env:
@@ -45,7 +45,6 @@ spec:
                 configMapKeyRef:
                   name: db-config
                   key: dbname
-
               
 ---
 
