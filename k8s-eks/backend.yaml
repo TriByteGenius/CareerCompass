@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: andyg2025/backend:v8
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PYTHON_ENGINE_URL
+              value: "http://python-engine:8000/update"
+
+            - name: DATABASE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: username
+
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: password
+          
+            - name: DB_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: endpoint
+          
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: dbname
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer

@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,16 +15,18 @@ spec:
     spec:
       containers:
         - name: backend
-          image: backend
+          image: andyg2025/backend:v8
           ports:
             - containerPort: 8080
           env:
-            - name: SPRING_DATASOURCE_URL
+            - name: DATABASE_URL
               value: "jdbc:postgresql://postgres:5432/mydb"
             - name: SPRING_DATASOURCE_USERNAME
               value: "postgres"
             - name: SPRING_DATASOURCE_PASSWORD
               value: "mysecretpassword"
+            - name: PYTHON_ENGINE_URL
+              value: "http://python-engine:8000/update"
 
 ---
 
