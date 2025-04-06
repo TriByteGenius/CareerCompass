@@ -7,6 +7,10 @@ import com.tribytegenius.CareerCompass.dto.SearchRequestBody;
 import java.util.List;
 
 public interface JobService {
+    String getNewJobs(
+            String keyword
+    );
+
     JobResponse getAllJobs(
             Integer pageNumber,
             Integer pageSize,

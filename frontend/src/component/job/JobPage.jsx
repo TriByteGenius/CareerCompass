@@ -4,6 +4,7 @@ import useJobFilter from '../hooks/useJobFilter';
 import { getFavoriteJobs } from '../../redux/slices/favoriteSlice';
 import { Grid, Box, Typography, Container, CircularProgress, Alert } from '@mui/material';
 import Filter from './Filter';
+import AdminSearch from './AdminSearch';
 import JobCard from './JobCard';
 import Paginations from './Paginations';
 import WorkIcon from '@mui/icons-material/Work';
@@ -21,6 +22,11 @@ const getJobStatus = (favoriteJobs = [], jobId) => {
   return favoriteJob?.status || 'new';
 };
 
+// Helper function to check if user has admin role
+const hasAdminRole = (roles = []) => {
+  return Array.isArray(roles) && roles.some(role => role === 'ROLE_ADMIN');
+};
+
 const JobPage = () => {
   useJobFilter();
   const dispatch = useDispatch();
@@ -28,6 +34,8 @@ const JobPage = () => {
   const { pageNumber, pageSize, totalElements, totalPages } = useSelector(state => state.job.pagination);
   const { isAuthenticated } = useSelector(state => state.auth);
   const { favoriteJobs } = useSelector(state => state.favorites);
+  const { user } = useSelector(state => state.auth);
+  const isAdmin = user && hasAdminRole(user.roles);
 
   // Fetch favorite jobs only when the user is authenticated
   useEffect(() => {
@@ -50,6 +58,13 @@ const JobPage = () => {
         <Box sx={{ top: 0, zIndex: 10, py: 2, mb: 3 }} data-testid="filter-section">
           <Filter />
         </Box>
+
+        {/* Admin Search - only visible for admin users */}
+        {isAdmin && (
+          <Box sx={{ mb: 3 }} data-testid="admin-search-section">
+            <AdminSearch />
+          </Box>
+        )}
 
         {/* Loading indicator */}
         {loading && (

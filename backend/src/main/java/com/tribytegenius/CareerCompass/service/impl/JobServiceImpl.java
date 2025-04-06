@@ -37,34 +37,26 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private ModelMapper modelMapper;
 
-
     @Override
-    public JobResponse getAllJobs(
-            Integer pageNumber,
-            Integer pageSize,
-            String sortBy,
-            String sortOrder,
-            String keyword,
-            String status,
-            String website,
-            Integer timeInDays
+    public String getNewJobs(
+            String keyword
     ) {
         try {
             searchJob(new SearchRequestBody(
-                website != null ? website :"LINKEDIN",
-                keyword != null ? List.of(keyword) : List.of("Software Engineer"), 
-                "Ireland", 
-                timeInDays != null ? timeInDays: 1 ));
+                    "LINKEDIN",
+                    keyword != null ? List.of(keyword) : List.of("Software Engineer"),
+                    "Ireland",
+                    1));
         } catch (Exception e) {
             System.err.println("Warning: searchJob failed, proceeding with database-only results. Error: " + e.getMessage());
         }
         // this function log the error rather than return the error, 
         // means that even there are some error happend, the getAllJobsOld() will still excute.
         // this because the quota limits of google search api and easily run out
-        return getAllJobsOld(pageNumber, pageSize, sortBy, sortOrder, keyword, status, website, timeInDays);
+        return "Update jobs successfully";
     }
 
-    public JobResponse getAllJobsOld(
+    public JobResponse getAllJobs(
             Integer pageNumber,
             Integer pageSize,
             String sortBy,
@@ -176,13 +168,12 @@ public class JobServiceImpl implements JobService {
     @Override
     public void searchJob(SearchRequestBody searchRequestBody) {
         pythonServiceClient.post()
-            .bodyValue(searchRequestBody)
-            .retrieve()
-            .bodyToMono(Void.class)
-            .onErrorResume(e -> {
-                return Mono.error(new RuntimeException("Failed to call pythonServiceClient: " + e.getMessage()));
-            })
-            .subscribe();
+                .bodyValue(searchRequestBody)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .onErrorResume(e -> {
+                    return Mono.error(new RuntimeException("Failed to call pythonServiceClient: " + e.getMessage()));
+                })
+                .subscribe();
     }
-
 }

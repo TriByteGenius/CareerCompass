@@ -9,6 +9,7 @@ import {
   Box,
   InputAdornment,
   TextField,
+  IconButton
 } from "@mui/material";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -45,21 +46,21 @@ const Filter = () => {
     setSearchTerm(currentSearchTerm);
   }, [searchParams]);
 
-  // Handle search term change with debounce
-  useEffect(() => { 
-    const handler = setTimeout(() => {
-      if (searchTerm) {
-        params.set("keyword", searchTerm);
-      } else {
-        params.delete("keyword");
-      }
-      navigate(`${pathname}?${params.toString()}`);
-    }, 700);
+  const handleSearch = () => {
+    if (searchTerm) {
+      params.set("keyword", searchTerm);
+    } else {
+      params.delete("keyword");
+    }
+    navigate(`${pathname}?${params.toString()}`);
+    toast.success("Searching for jobs...");
+  };
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm, navigate, pathname, params]);
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const handleWebsiteChange = (event) => {
     const selectedWebsite = event.target.value;
@@ -136,6 +137,7 @@ const Filter = () => {
         placeholder="Search Jobs/Companies/Locations"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyPress={handleKeyPress}
         variant="outlined"
         size="small"
         sx={{ 
@@ -146,11 +148,16 @@ const Filter = () => {
           }
         }}
         InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
+          endAdornment: (
+            <IconButton 
+              onClick={handleSearch}
+              edge="end"
+              aria-label="search"
+              data-testid="search-button"
+            >
               <SearchIcon />
-            </InputAdornment>
-          ),
+            </IconButton>
+          )
         }}
         data-testid="search-input"
       />
@@ -192,10 +199,6 @@ const Filter = () => {
         >
           <MenuItem value="all" data-testid="status-option-all">All</MenuItem>
           <MenuItem value="new" data-testid="status-option-new">New</MenuItem>
-          <MenuItem value="applied" data-testid="status-option-applied">Applied</MenuItem>
-          <MenuItem value="interview" data-testid="status-option-interview">Interview</MenuItem>
-          <MenuItem value="rejected" data-testid="status-option-rejected">Rejected</MenuItem>
-          <MenuItem value="offer" data-testid="status-option-offer">Offer</MenuItem>
         </Select>
       </FormControl>
 
