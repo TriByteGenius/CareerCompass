@@ -108,7 +108,7 @@ jobs:
     - name: Checkout other repositories
       uses: actions/checkout@v4
       with:
-        repository: andyg2025/argo
+        repository: TriByteGenius/argo
         token: ${{ secrets.GH_TOKEN }}
 
     - name: Modify the deployment.yaml
