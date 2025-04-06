@@ -34,20 +34,20 @@ export const fetchJobs = createAsyncThunk(
   }
 );
 
-// Search Jobs with py backend
-export const searchJobs = createAsyncThunk(
-  'jobs/searchJobs',
-  async (searchData, { getState, rejectWithValue }) => {
+// Admin Search action
+export const searchJobsAdmin = createAsyncThunk(
+  'jobs/searchJobsAdmin',
+  async (keyword, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      await api.post('/jobs/search', searchData, {
+      const response = await api.get(`/jobs/update?keyword=${encodeURIComponent(keyword)}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return { success: true };
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Search failed');
+      return rejectWithValue(error.response?.data?.message || 'Admin search failed');
     }
   }
 );
@@ -105,17 +105,19 @@ const jobSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Search Jobs
+    // Admin Search Jobs
     builder
-      .addCase(searchJobs.pending, (state) => {
-        state.loading = true;
+      .addCase(searchJobsAdmin.pending, (state) => {
+        state.adminSearchLoading = true;
+        state.adminSearchMessage = null;
         state.error = null;
       })
-      .addCase(searchJobs.fulfilled, (state) => {
-        state.loading = false;
+      .addCase(searchJobsAdmin.fulfilled, (state, action) => {
+        state.adminSearchLoading = false;
+        state.adminSearchMessage = action.payload;
       })
-      .addCase(searchJobs.rejected, (state, action) => {
-        state.loading = false;
+      .addCase(searchJobsAdmin.rejected, (state, action) => {
+        state.adminSearchLoading = false;
         state.error = action.payload;
       });
   },

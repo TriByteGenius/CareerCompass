@@ -45,6 +45,28 @@ const Signin = ({ open, onClose, openSignup }) => {
     }
   };
 
+  const handleAdminLogin = async () => {
+    try {
+      // Use hardcoded admin credentials
+      const adminCredentials = {
+        email: "admin@example.com",
+        password: "password"
+      };
+      
+      const resultAction = await dispatch(login(adminCredentials));
+      if (login.fulfilled.match(resultAction)) {
+        toast.success('Admin login successful!');
+        reset();
+        onClose();
+      } else {
+        toast.error(resultAction.payload || 'Admin login failed.');
+      }
+    } catch (err) {
+      toast.error('An error occurred. Please try again.');
+      dispatch(clearError());
+    }
+  };
+
   const handleClose = () => {
     reset();
     onClose();
@@ -123,6 +145,18 @@ const Signin = ({ open, onClose, openSignup }) => {
             {loading ? <CircularProgress size={24} /> : 'Sign In'}
           </Button>
         </form>
+
+        <Button 
+          variant="outlined" 
+          color="primary" 
+          fullWidth 
+          onClick={handleAdminLogin}
+          disabled={loading}
+          sx={{ mb: 2, py: 1 }}
+          data-testid="admin-login-button"
+        >
+          Trial Admin Login
+        </Button>
 
         <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
           Don't have an account?{' '}
