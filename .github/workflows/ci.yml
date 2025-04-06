@@ -59,7 +59,7 @@ jobs:
         DB_ENDPOINT: localhost:5432
         DB_NAME: postgres
       run: |
-        pytest
+        pytest test.py
 
     # ### Spring Boot ###
     # - name: Set up JDK 17
