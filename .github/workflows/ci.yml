@@ -40,69 +40,69 @@ jobs:
     
     ### Python engine ###
 
-    # - name: Set up Python
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: '3.12'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
 
-    # - name: Install dependencies
-    #   working-directory: ./python-service
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install -r requirments.txt
+    - name: Install dependencies
+      working-directory: ./python-service
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirments.txt
 
-    # - name: Run tests
-    #   working-directory: ./python-service
-    #   env:
-    #     DATABASE_USERNAME: postgres
-    #     DATABASE_PASSWORD: ""
-    #     DB_ENDPOINT: localhost:5432
-    #     DB_NAME: postgres
-    #   run: |
-    #     pytest test.py
+    - name: Run tests
+      working-directory: ./python-service
+      env:
+        DATABASE_USERNAME: postgres
+        DATABASE_PASSWORD: ""
+        DB_ENDPOINT: localhost:5432
+        DB_NAME: postgres
+      run: |
+        pytest test.py
 
     ### Spring Boot ###
-    # - name: Set up JDK 17
-    #   uses: actions/setup-java@v3
-    #   with:
-    #     distribution: 'temurin'
-    #     java-version: 17
-    #     cache: 'maven'
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: 17
+        cache: 'maven'
 
-    # - name: Test backend
-    #   working-directory: ./backend
-    #   run: |
-    #     ./mvnw test
+    - name: Test backend
+      working-directory: ./backend
+      run: |
+        ./mvnw test
 
     ### React Frontend ###
-    # - name: Set up Node.js
-    #   uses: actions/setup-node@v3
-    #   with:
-    #     node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
-    # - name: Install frontend dependencies
-    #   working-directory: ./frontend
-    #   run: npm install
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm install
       
-    # - name: Run React tests
-    #   working-directory: ./frontend
-    #   run: npm test
+    - name: Run React tests
+      working-directory: ./frontend
+      run: npm test
 
-    # - name: deploy frontend
-    #   working-directory: ./frontend
-    #   run: echo "deploy frontend"
+    - name: deploy frontend
+      working-directory: ./frontend
+      run: echo "deploy frontend"
 
-    # - name: Build and Push Python-engine Images
-    #   working-directory: ./python-service
-    #   run: |
-    #     docker build -t andyg2025/python-engine:$VERSION .
-    #     docker push andyg2025/python-engine:$VERSION
+    - name: Build and Push Python-engine Images
+      working-directory: ./python-service
+      run: |
+        docker build -t andyg2025/python-engine:$VERSION .
+        docker push andyg2025/python-engine:$VERSION
 
-    # - name: Build and Push spring backend Images
-    #   working-directory: ./backend
-    #   run: |
-    #     ./mvnw clean package -DskipTests && docker build -t andyg2025/backend:$VERSION .
-    #     docker push andyg2025/backend:$VERSION
+    - name: Build and Push spring backend Images
+      working-directory: ./backend
+      run: |
+        ./mvnw clean package -DskipTests && docker build -t andyg2025/backend:$VERSION .
+        docker push andyg2025/backend:$VERSION
 
 
     - name: Checkout other repositories

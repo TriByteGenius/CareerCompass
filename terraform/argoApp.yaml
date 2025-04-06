@@ -9,7 +9,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     path: .
-    repoURL: https://github.com/andy1994new/argo1.git
+    repoURL: https://github.com/TriByteGenius/argo.git
     targetRevision: HEAD
   project: default
   syncPolicy:
