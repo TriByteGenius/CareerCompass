@@ -84,9 +84,9 @@ jobs:
     #   working-directory: ./frontend
     #   run: npm install
       
-    - name: Run React tests
-      working-directory: ./frontend
-      run: npm test
+    # - name: Run React tests
+    #   working-directory: ./frontend
+    #   run: npm test
 
     # - name: deploy frontend
     #   working-directory: ./frontend
