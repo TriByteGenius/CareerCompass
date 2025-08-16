@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  AWS_REGION: us-west-2
+  AWS_REGION: eu-west-1
   EKS_CLUSTER_NAME: careercompass-cluster
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   
@@ -33,6 +33,13 @@ jobs:
     # Build all Spring Boot services
     - name: Build Spring Boot services
       run: |
+        # Give execute permission to mvnw files
+        chmod +x "backend micro service/ApiGateway/mvnw"
+        chmod +x "backend micro service/UserService/mvnw"
+        chmod +x "backend micro service/JobService/mvnw"
+        chmod +x "backend micro service/UserJobService/mvnw"
+        
+        # Build services
         cd "backend micro service/ApiGateway"
         ./mvnw clean package -DskipTests
         cd "../.."
