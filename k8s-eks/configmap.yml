@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: careercompass-prod
+data:
+  # Just the essential configs
+  JWT_SECRET: "daf66e01593f61a15b857cf433aae03a005812b31234e149036bcc8dee755dbb"
+  JWT_EXPIRATION: "86400000"

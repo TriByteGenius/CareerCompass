@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userjob-service
+  namespace: careercompass-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userjob-service
+  template:
+    metadata:
+      labels:
+        app: userjob-service
+    spec:
+      containers:
+        - name: userjob-service
+          image: ${DOCKERHUB_USERNAME}/userjob-service:${IMAGE_TAG}
+          ports:
+            - containerPort: 8083
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+
+---
+# UserJob Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: userjob-service
+  namespace: careercompass-prod
+spec:
+  selector:
+    app: userjob-service
+  ports:
+    - port: 8083
+      targetPort: 8083
+  type: ClusterIP

@@ -1,20 +1,19 @@
 # main.py
 
-from sqlalchemy.orm import Session
-from fastapi import FastAPI, Depends, HTTPException
-import models
-from database import engine, get_db
-from utils import update_jobs
+from fastapi import FastAPI, HTTPException
+from utils import search_and_publish_jobs
 from schemas import JobUpdateRequestSchema
-
-models.Base.metadata.create_all(engine)
 
 app = FastAPI()
 
 @app.get("/test")
 def test():
-    return "Python engineer test ok!"
+    return "Python engine test ok!"
 
 @app.post("/update")
-def get_index(request: JobUpdateRequestSchema, db: Session = Depends(get_db)):
-    return update_jobs(request, db)
+def update_jobs(request: JobUpdateRequestSchema):
+    try:
+        result = search_and_publish_jobs(request)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

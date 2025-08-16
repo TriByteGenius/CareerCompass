@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: careercompass
+data:
+  # User Service Database Configuration
+  USER_DATABASE_URL: "jdbc:postgresql://user-postgres:5432/userdb"
+  USER_DATABASE_USERNAME: "postgres"
+  USER_DATABASE_PASSWORD: "password"
+
+  # Job Service Database Configuration
+  JOB_DATABASE_URL: "jdbc:postgresql://job-postgres:5432/jobdb"
+  JOB_DATABASE_USERNAME: "postgres"
+  JOB_DATABASE_PASSWORD: "password"
+
+  # UserJob Service Database Configuration
+  USERJOB_DATABASE_URL: "jdbc:postgresql://userjob-postgres:5432/userjobdb"
+  USERJOB_DATABASE_USERNAME: "postgres"
+  USERJOB_DATABASE_PASSWORD: "password"
+
+  # RabbitMQ Configuration
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: "guest"
+  RABBITMQ_PASSWORD: "guest"
+  RABBITMQ_VHOST: "/"
+
+  # JWT Configuration
+  JWT_SECRET: "daf66e01593f61a15b857cf433aae03a005812b31234e149036bcc8dee755dbb"
+  JWT_EXPIRATION: "86400000"
+
+  # Python Service Configuration
+  PYTHON_SERVICE_URL: "http://python-engine:8000"
+
+  # Google API Configuration (for Python service)
+  API_KEY: "AIzaSyBeJWKq-gO6txR-QUQ_C3EH1WppYhRrDGM"
+  CX_ID: "85002c9737cdd41a2"

@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-service
+  namespace: careercompass
+  labels:
+    app: job-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: job-service
+  template:
+    metadata:
+      labels:
+        app: job-service
+    spec:
+      containers:
+        - name: job-service
+          image: andyg2025/job-service:v1
+          ports:
+            - containerPort: 8082
+          env:
+            - name: JOB_DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: JOB_DATABASE_URL
+            - name: JOB_DATABASE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: JOB_DATABASE_USERNAME
+            - name: JOB_DATABASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: JOB_DATABASE_PASSWORD
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_USERNAME
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PASSWORD
+            - name: RABBITMQ_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_VHOST
+            - name: PYTHON_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PYTHON_SERVICE_URL
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "400m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-service
+  namespace: careercompass
+  labels:
+    app: job-service
+spec:
+  selector:
+    app: job-service
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+  type: ClusterIP

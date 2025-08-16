@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-engine
+  namespace: careercompass
+  labels:
+    app: python-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-engine
+  template:
+    metadata:
+      labels:
+        app: python-engine
+    spec:
+      containers:
+        - name: python-engine
+          image: andyg2025/python-engine:v1
+          ports:
+            - containerPort: 8000
+          env:
+            - name: API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: API_KEY
+            - name: CX_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CX_ID
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_USERNAME
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PASSWORD
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-engine
+  namespace: careercompass
+  labels:
+    app: python-engine
+spec:
+  selector:
+    app: python-engine
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-engine
+  namespace: careercompass-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-engine
+  template:
+    metadata:
+      labels:
+        app: python-engine
+    spec:
+      containers:
+        - name: python-engine
+          image: ${DOCKERHUB_USERNAME}/python-engine:${IMAGE_TAG}
+          ports:
+            - containerPort: 8000
+
+---
+# Python Engine Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-engine
+  namespace: careercompass-prod
+spec:
+  selector:
+    app: python-engine
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP

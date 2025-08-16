@@ -1,0 +1,8 @@
+# EKS Namespace for CareerCompass Application
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: careercompass-prod
+  labels:
+    name: careercompass-prod
+    environment: production

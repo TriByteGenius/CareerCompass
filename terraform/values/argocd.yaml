@@ -1,8 +1,0 @@
----
-global:
-  image:
-    tag: v2.13.3
-
-sever:
-  extraArgs:
-    - --insecure

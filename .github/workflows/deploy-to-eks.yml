@@ -1,0 +1,88 @@
+name: Simple Deploy to EKS
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-west-2
+  EKS_CLUSTER_NAME: careercompass-cluster
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Build and push Docker images
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Set image tag
+      id: set-tag
+      run: echo "tag=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+    
+    - name: Build and push all images
+      run: |
+        IMAGE_TAG=${{ steps.set-tag.outputs.tag }}
+        
+        # Build all images
+        docker build -t ${{ env.DOCKERHUB_USERNAME }}/api-gateway:$IMAGE_TAG "./backend micro service/ApiGateway"
+        docker build -t ${{ env.DOCKERHUB_USERNAME }}/user-service:$IMAGE_TAG "./backend micro service/UserService"
+        docker build -t ${{ env.DOCKERHUB_USERNAME }}/job-service:$IMAGE_TAG "./backend micro service/JobService"
+        docker build -t ${{ env.DOCKERHUB_USERNAME }}/userjob-service:$IMAGE_TAG "./backend micro service/UserJobService"
+        docker build -t ${{ env.DOCKERHUB_USERNAME }}/python-engine:$IMAGE_TAG "./python-service"
+        docker build -t ${{ env.DOCKERHUB_USERNAME }}/frontend:$IMAGE_TAG "./frontend"
+        
+        # Push all images
+        docker push ${{ env.DOCKERHUB_USERNAME }}/api-gateway:$IMAGE_TAG
+        docker push ${{ env.DOCKERHUB_USERNAME }}/user-service:$IMAGE_TAG
+        docker push ${{ env.DOCKERHUB_USERNAME }}/job-service:$IMAGE_TAG
+        docker push ${{ env.DOCKERHUB_USERNAME }}/userjob-service:$IMAGE_TAG
+        docker push ${{ env.DOCKERHUB_USERNAME }}/python-engine:$IMAGE_TAG
+        docker push ${{ env.DOCKERHUB_USERNAME }}/frontend:$IMAGE_TAG
+
+    # Deploy to EKS
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Update kubeconfig
+      run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+    
+    - name: Replace image tags and deploy
+      run: |
+        IMAGE_TAG=${{ steps.set-tag.outputs.tag }}
+        
+        # Replace variables in YAML files
+        find k8s-eks/ -name "*.yml" -exec sed -i "s/\${DOCKERHUB_USERNAME}/${{ env.DOCKERHUB_USERNAME }}/g" {} \;
+        find k8s-eks/ -name "*.yml" -exec sed -i "s/\${IMAGE_TAG}/$IMAGE_TAG/g" {} \;
+        
+        # Deploy everything
+        kubectl apply -f k8s-eks/namespace.yml
+        kubectl apply -f k8s-eks/configmap.yml
+        kubectl apply -f k8s-eks/postgres.yml
+        kubectl apply -f k8s-eks/rabbitmq.yml
+        kubectl apply -f k8s-eks/api-gateway.yml
+        kubectl apply -f k8s-eks/user-service.yml
+        kubectl apply -f k8s-eks/job-service.yml
+        kubectl apply -f k8s-eks/userjob-service.yml
+        kubectl apply -f k8s-eks/python-engine.yml
+        kubectl apply -f k8s-eks/frontend.yml
+        
+        # Wait a bit for services to start
+        sleep 60
+        
+        # Show service status
+        kubectl get svc -n careercompass-prod
+        echo "Frontend URL: $(kubectl get svc frontend-lb -n careercompass-prod -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo 'Loading...')"
+        echo "API Gateway URL: $(kubectl get svc api-gateway-lb -n careercompass-prod -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo 'Loading...')"

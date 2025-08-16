@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userjob-service
+  namespace: careercompass
+  labels:
+    app: userjob-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userjob-service
+  template:
+    metadata:
+      labels:
+        app: userjob-service
+    spec:
+      containers:
+        - name: userjob-service
+          image: andyg2025/userjob-service:v1
+          ports:
+            - containerPort: 8083
+          env:
+            - name: USERJOB_DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USERJOB_DATABASE_URL
+            - name: USERJOB_DATABASE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USERJOB_DATABASE_USERNAME
+            - name: USERJOB_DATABASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USERJOB_DATABASE_PASSWORD
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_USERNAME
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PASSWORD
+            - name: RABBITMQ_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_VHOST
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "400m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userjob-service
+  namespace: careercompass
+  labels:
+    app: userjob-service
+spec:
+  selector:
+    app: userjob-service
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
+  type: ClusterIP

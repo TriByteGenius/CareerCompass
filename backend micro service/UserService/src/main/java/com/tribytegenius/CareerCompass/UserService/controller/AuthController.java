@@ -1,0 +1,167 @@
+package com.tribytegenius.CareerCompass.UserService.controller;
+
+import com.tribytegenius.CareerCompass.UserService.dto.UserDTO;
+import com.tribytegenius.CareerCompass.UserService.dto.UserEventDTO;
+import com.tribytegenius.CareerCompass.UserService.exception.ResourceNotFoundException;
+import com.tribytegenius.CareerCompass.UserService.model.AppRole;
+import com.tribytegenius.CareerCompass.UserService.model.Role;
+import com.tribytegenius.CareerCompass.UserService.model.User;
+import com.tribytegenius.CareerCompass.UserService.repository.RoleRepository;
+import com.tribytegenius.CareerCompass.UserService.repository.UserRepository;
+import com.tribytegenius.CareerCompass.UserService.security.UserDetailsImpl;
+import com.tribytegenius.CareerCompass.UserService.security.dto.LoginRequest;
+import com.tribytegenius.CareerCompass.UserService.security.dto.LoginResponse;
+import com.tribytegenius.CareerCompass.UserService.security.dto.MessageResponse;
+import com.tribytegenius.CareerCompass.UserService.security.dto.SignupRequest;
+import com.tribytegenius.CareerCompass.UserService.security.jwt.JwtUtils;
+import com.tribytegenius.CareerCompass.UserService.service.impl.UserEventPublisher;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PasswordEncoder encoder;
+
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    UserEventPublisher userEventPublisher;
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        Authentication authentication;
+        try {
+            authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        } catch (AuthenticationException exception) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("message", "Bad credentials");
+            map.put("status", false);
+            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .toList();
+
+        LoginResponse response = new LoginResponse(
+                userDetails.getId(),
+                jwtToken,
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (userRepository.existsByUserName(signUpRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
+
+        Set<String> strRoles = signUpRequest.getRole();
+        Set<Role> roles = new HashSet<>();
+
+        if (strRoles == null) {
+            Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case "admin":
+                        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(adminRole);
+                        break;
+                    default:
+                        Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                }
+            });
+        }
+        user.setRoles(roles);
+        User savedUser = userRepository.save(user);
+
+        // Publish user created event to RabbitMQ
+        List<String> roleNames = savedUser.getRoles().stream()
+                .map(role -> role.getRoleName().name())
+                .collect(Collectors.toList());
+
+        UserEventDTO userEvent = new UserEventDTO(
+                savedUser.getId(),
+                savedUser.getUserName(),
+                savedUser.getEmail(),
+                roleNames,
+                "CREATED"
+        );
+        userEventPublisher.publishUserCreated(userEvent);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully"));
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<UserDTO> currentUserDetails(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userDetails.getId()));
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .toList();
+
+        UserDTO userDTO = new UserDTO(
+                user.getId(),
+                user.getUserName(),
+                user.getEmail(),
+                roles,
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+
+        return ResponseEntity.ok().body(userDTO);
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<?> signOutUser() {
+        return ResponseEntity.ok(new MessageResponse("You've been logged out successfully"));
+    }
+}
