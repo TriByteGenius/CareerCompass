@@ -1,171 +1,149 @@
-# CareerCompass - Job Search Management System
+# CareerCompass — Job Search Management Platform
 
-## Project Overview
-CareerCompass is a full-stack web application designed to streamline the job search process by providing a centralized platform to discover opportunities, track applications, and manage your career journey.
+## Overview
+CareerCompass is a microservices-based web platform for discovering job opportunities, saving favorites, tracking application progress, and generating AI-assisted insights from job descriptions. The system consists of a React frontend, multiple Spring Boot services, and a Python service, exposed via an API Gateway. RabbitMQ enables asynchronous inter-service communication, and Redis accelerates AI result retrieval via caching.
 
-The application features a React frontend with Material UI components and a robust backend built with Spring Boot Java and FastAPI Python microservices. The system allows users to search for jobs across multiple platforms, save favorites, and track application statuses through an intuitive workflow.
 
-Try our application here:
-[`CareerCompass`][demo]
+## Architecture & Services
 
-[demo]: http://
+### Services
+- **API Gateway (Spring Cloud Gateway):** Central entrypoint for routing and cross-cutting concerns.
+- **UserService (Java):** Authentication, user profiles, and user lifecycle events publishing.
+- **JobService (Java):** Job data and search; AI job analysis; publishes/consumes job-related events; Redis-backed AI result cache.
+- **UserJobService (Java):** Favorites and application tracking; consumes user/job events to maintain user–job views.
+- **Python Service (FastAPI):** Page fetching/parsing and auxiliary analysis; integrates with RabbitMQ.
+- **Frontend (React + Vite):** SPA consuming backend via gateway paths and configurable relative APIs [[memory:6234778]].
+
+### Middleware
+- **RabbitMQ (AMQP):**
+  - Java services use `spring-boot-starter-amqp` for publishers and `@RabbitListener` consumers.
+  - Kubernetes manifests: `k8s-dev/rabbitmq.yml`, `k8s-eks/rabbitmq.yml`; deployment scripted in `deploy.sh`.
+- **Redis:**
+  - `JobService` includes `spring-boot-starter-data-redis` for caching AI analysis results (24h TTL).
+- **PostgreSQL:**
+  - Service-scoped schemas via JPA/Hibernate.
 
 
 ## Technology Stack
 
 ### Frontend
-- **Framework:** React 19.0.0 with Vite 6.2.0
-- **State Management:** Redux Toolkit 2.6.1
-- **UI Components:** Material UI 6.4.7
-- **Form Handling:** React Hook Form 7.54.2
-- **HTTP Client:** Axios 1.8.2
-- **Notifications:** React Hot Toast 2.5.2
-- **Testing:** Vitest 3.0.9, React Testing Library 16.2.0
+- React 19, Vite 6
+- Redux Toolkit, Material UI
+- Axios, React Hook Form, React Hot Toast
+- Testing: Vitest, React Testing Library
 
 ### Backend
-- **Java API:** Spring Boot 3.4.3
-    - **Security:** Spring Security with JWT
-    - **Database:** PostgreSQL with JPA/Hibernate, RDS for cloud deployment
-    - **Testing:** JUnit, Mockito
-- **Python API:** FastAPI
-    - **HTTP Client:** Requests
-    - **Data Processing:** Beautiful Soup 4, Pandas
+- Spring Boot 3 (JWT, JPA/Hibernate, AMQP, Redis)
+- FastAPI (fetch/parse, MQ integration)
 
-### DevOps & CI/CD
-- **Version Control:** Git
-- **Build Tools:** Maven (Java), pip (Python)
-- **CI/CD Pipeline:** GitHub Actions
-- **Containerization:** Docker
-- **Project Management:** ZenHub with Scrum methodology
+### Infra & Delivery
+- Docker
+- Kubernetes manifests: `k8s-dev/` (dev), `k8s-eks/` (cloud)
+- GitHub Actions CI/CD
 
-## Core Features
 
-### Job Search & Discovery
-- Integration with multiple job listing platforms (LinkedIn, Indeed, IrishJobs, Jobs.ie)
-- Advanced filtering capabilities by keywords, job types, and locations
-- Time-based filtering for job freshness
-- Customizable search interface with persistent URL parameters
+## AI Capabilities
+- `AIAgentService` (in `JobService`):
+  - Fetches visible text from job pages (`PageFetchService`) and calls `OpenAIClientService` for structured analysis.
+  - Caches results in Redis using a SHA-256 key derived from the source URL (24h TTL).
+- `OpenAIClientService`:
+  - Calls `https://api.openai.com/v1/chat/completions` with a configurable API key; extracts: `requiredSkills`, `experienceLevel`, `keyRequirements`, `roleType`, `difficulty`.
+- Python Service:
+  - Supports job crawling/parsing and asynchronous collaboration with Java services via RabbitMQ.
 
-### User Account Management
-- Secure JWT-based authentication
-- User registration and profile management
 
-### Application Tracking
-- Save interesting positions to favorites
-- Track application status (New, Applied, Interview, Offer, Rejected)
-- Visual status indicators for application progress
-- Organization by application stage
+## API Gateway & Routing
+- Spring Cloud Gateway routes are configured via `application-*.yml` to forward requests to `UserService`, `JobService`, `UserJobService`, and the Python service.
+- Prefer using a single routing configuration approach (YAML or Java DSL) to avoid conflicts.
 
-### User Interface
-- Responsive design for all device sizes
-- Intuitive navigation with MUI components
-- Real-time notifications for user actions
-- Dark/light theme support
 
-## Installation & Setup
+## Local Development
 
 ### Prerequisites
 - Node.js 18+
 - Java 17+
 - Python 3.9+
 - PostgreSQL 14+
+- RabbitMQ, Redis
 
-### Frontend Setup
-1. Navigate to the frontend directory:
+### Recommended Startup Order
+1. Start PostgreSQL, RabbitMQ, Redis.
+2. Start backend services (suggested): `UserService` → `JobService` → `UserJobService` → `ApiGateway` → `python-service`.
+3. Start the frontend.
+
+### Frontend (dev)
 ```bash
 cd frontend
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Start development server:
-```bash
 npm run dev
 ```
 
-### Java Backend Setup
-1. Navigate to the java-api directory:
+The SPA uses relative/gateway paths for backend APIs to avoid hardcoding service URLs [[memory:6234778]].
+
+### Java services (example: JobService)
 ```bash
-cd backend/java-api
+cd "backend micro service/JobService"
+./mvnw spring-boot:run  # On Windows: mvnw.cmd
 ```
 
-2. Configure database properties in `application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/careercompass
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-```
+Configure DB, MQ, Redis, and the OpenAI key via `src/main/resources/application-local.yml` and environment variables (see next section). Apply the same pattern for `UserService`, `UserJobService`, and `ApiGateway`.
 
-3. Build and run the application:
+### Python service
 ```bash
-mvn spring-boot:run
-```
-
-### Python Backend Setup
-1. Navigate to the python-api directory:
-```bash
-cd backend/python-api
-```
-
-2. Set up virtual environment:
-```bash
+cd python-service
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Set up environment variables:
-```bash
-export SQLALCHEMY_DATABASE_URL="postgresql://user:password@localhost/careercompass"
-export API_KEY="your_google_search_api_key"
-export CX_ID="your_custom_search_engine_id"
-```
-
-5. Run the application:
-```bash
+venv\Scripts\activate  # Windows
+pip install -r requirments.txt
 uvicorn main:app --reload
 ```
 
+
+## Configuration & Environment
+
+### Java services (common)
+- Database: `spring.datasource.*`
+- RabbitMQ: `spring.rabbitmq.*` or custom `rabbitmq.*` keys as defined per service
+
+### JobService
+- Redis: `spring.redis.host` (e.g., `${SPRING_REDIS_HOST:redis}` in `application-prod.yml`)
+- OpenAI: `openai.api-key`
+
+### Python service
+- RabbitMQ: `RABBITMQ_HOST` (see `k8s-dev/configmap.yml`)
+- Additional crawling/analysis settings as needed
+
+### Kubernetes
+- Dev: `k8s-dev/` (includes `rabbitmq.yml`, service manifests, and `deploy.sh` automation)
+- Cloud: `k8s-eks/`
+
+
+## Core Features
+- Multi-source job discovery with filters (keyword, type, location, freshness)
+- JWT-based authentication and user management
+- Favorites and application status tracking (New, Applied, Interview, Offer, Rejected)
+- Responsive UI with real-time feedback
+- AI job insights (skills, experience level, key requirements, role type, difficulty)
+
+
 ## Testing
-- Frontend components are tested with Vitest and React Testing Library
-- Backend services are tested with JUnit and Mockito
-- Test coverage is tracked with JaCoCo for Java and coverage-v8 for JavaScript
+- Frontend: Vitest, React Testing Library
+- Backend: JUnit, Mockito; coverage via JaCoCo (Java) and V8 (JS)
 
-## Development Methodology
-Our team implemented Agile development practices using the Scrum framework:
-
-- **Sprint Planning:** Bi-weekly sprints with clearly defined goals and deliverables
-- **Daily Stand-ups:** Regular team check-ins to discuss progress and roadblocks
-- **Sprint Reviews & Retrospectives:** End-of-sprint evaluations to improve processes
-- **ZenHub Integration:** For backlog management, sprint planning, and tracking
 
 ## CI/CD & Deployment
-The project implements a robust CI/CD pipeline using GitHub Actions:
-
-- **Continuous Integration:**
-    - Automated testing on pull requests
-    - Code quality checks
-
-- **Continuous Deployment:**
-    - Automated Docker image building
-    - Production deployment after approval
+- GitHub Actions for build, test, and image publishing
+- Docker images for local and Kubernetes deployments
 
 
-## 🖼️ Application Screenshots
-
-### Jobs interface
-- Job Browsing
-- Job Details
-
-### User interface
-- Job Tracking
+## Repository Structure (high level)
+- `frontend/`
+- `backend micro service/ApiGateway/`
+- `backend micro service/UserService/`
+- `backend micro service/JobService/`
+- `backend micro service/UserJobService/`
+- `python-service/`
+- `k8s-dev/`, `k8s-eks/`
+- `database/`
 
 
 ## Contributors
