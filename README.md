@@ -8,18 +8,18 @@ CareerCompass is a microservices-based web platform for discovering job opportun
 
 ### Services
 - **API Gateway (Spring Cloud Gateway):** Central entrypoint for routing and cross-cutting concerns.
-- **UserService (Java):** Authentication, user profiles, and user lifecycle events publishing.
-- **JobService (Java):** Job data and search; AI job analysis; publishes/consumes job-related events; Redis-backed AI result cache.
-- **UserJobService (Java):** Favorites and application tracking; consumes user/job events to maintain user–job views.
+- **UserService (Spring Boot):** Authentication, user profiles, and user lifecycle events publishing.
+- **JobService (Spring Boot):** Job data and search; AI job analysis; publishes/consumes job-related events; Redis-backed AI result cache.
+- **UserJobService (Spring Boot):** Favorites and application tracking; consumes user/job events to maintain user–job views.
 - **Python Service (FastAPI):** Page fetching/parsing and auxiliary analysis; integrates with RabbitMQ.
-- **Frontend (React + Vite):** SPA consuming backend via gateway paths and configurable relative APIs [[memory:6234778]].
+- **Frontend (React + Vite):** SPA consuming backend via gateway paths and configurable relative APIs.
 
 ### Middleware
 - **RabbitMQ (AMQP):**
   - Java services use `spring-boot-starter-amqp` for publishers and `@RabbitListener` consumers.
   - Kubernetes manifests: `k8s-dev/rabbitmq.yml`, `k8s-eks/rabbitmq.yml`; deployment scripted in `deploy.sh`.
 - **Redis:**
-  - `JobService` includes `spring-boot-starter-data-redis` for caching AI analysis results (24h TTL).
+  - `JobService` includes `spring-boot-starter-data-redis` for caching AI analysis results.
 - **PostgreSQL:**
   - Service-scoped schemas via JPA/Hibernate.
 
