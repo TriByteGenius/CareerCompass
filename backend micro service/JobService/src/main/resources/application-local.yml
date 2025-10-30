@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: job-service
+  redis:
+    host: localhost
+    port: 6379
   
   datasource:
     url: jdbc:postgresql://localhost:5432/jobdb
@@ -30,6 +33,9 @@ spring:
 python:
   service:
     url: http://localhost:8000
+
+openai:
+  api-key: ${OPENAI_API_KEY:}
 
 management:
   endpoints:

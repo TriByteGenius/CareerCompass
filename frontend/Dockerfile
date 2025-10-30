@@ -1,4 +1,3 @@
-# Simple Frontend Dockerfile
 FROM nginx:alpine
 
 # Copy built files
