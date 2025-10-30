@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: job-service
+  redis:
+    host: ${SPRING_REDIS_HOST:redis}
+    port: ${SPRING_REDIS_PORT:6379}
   
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/jobdb}
@@ -23,6 +26,9 @@ spring:
 python:
   service:
     url: ${PYTHON_SERVICE_URL:http://python-engine:8000}
+
+openai:
+  api-key: ${OPENAI_API_KEY:}
 
 logging:
   level:

@@ -14,7 +14,13 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Alert
 } from '@mui/material';
 import getFreshnessBanner from '../../util/getFreshness';
 import formatDate from '../../util/formatDate';
@@ -34,6 +40,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import toast from 'react-hot-toast';
+import { analyzeJobByUrl } from '../../api/api';
 
 // Status options with icons and colors
 const statusOptions = [
@@ -81,6 +88,12 @@ const JobCard = ({
   const [statusLoading, setStatusLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const freshness = getFreshnessBanner(time);
+
+  // AI dialog state
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [aiResult, setAiResult] = useState(null);
   
   // Find current status option
   const currentStatus = getStatusOption(applicationStatus);
@@ -133,6 +146,23 @@ const JobCard = ({
     } finally {
       setStatusLoading(false);
       handleStatusClose();
+    }
+  };
+
+  const handleAnalyzeClick = async () => {
+    setAiOpen(true);
+    setAiError('');
+    setAiResult(null);
+    setAiLoading(true);
+    try {
+      const data = await analyzeJobByUrl(url);
+      // data could be wrapped or plain; handle both
+      const result = data?.data || data;
+      setAiResult(result);
+    } catch (e) {
+      setAiError(e?.response?.data?.message || 'Failed to analyze the job.');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -293,17 +323,83 @@ const JobCard = ({
             {isFavorite ? "Saved" : "Save Job"}
           </Button>
           
-          <Button 
-            variant="contained" 
-            color="primary" 
-            size="small" 
-            endIcon={<LaunchIcon />}
-            onClick={() => window.open(url, '_blank')}
-            data-testid="apply-button"
-          >
-            Apply Now
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button 
+              variant="outlined" 
+              color="secondary" 
+              size="small"
+              onClick={handleAnalyzeClick}
+              data-testid="ai-analyze-button"
+            >
+              AI Analyze
+            </Button>
+
+            <Button 
+              variant="contained" 
+              color="primary" 
+              size="small" 
+              endIcon={<LaunchIcon />}
+              onClick={() => window.open(url, '_blank')}
+              data-testid="apply-button"
+            >
+              Apply Now
+            </Button>
+          </Stack>
         </Box>
+
+        {/* AI Result Dialog */}
+        <Dialog open={aiOpen} onClose={() => setAiOpen(false)} fullWidth maxWidth="sm">
+          <DialogTitle>AI Job Analysis</DialogTitle>
+          <DialogContent>
+            {aiLoading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                <CircularProgress />
+              </Box>
+            )}
+            {!aiLoading && aiError && (
+              <Alert severity="error" sx={{ my: 1 }}>{aiError}</Alert>
+            )}
+            {!aiLoading && aiResult && (
+              <>
+                {Array.isArray(aiResult.requiredSkills) && aiResult.requiredSkills.length > 0 && (
+                  <>
+                    <Typography variant="subtitle2" sx={{ mt: 1 }}>Required Skills</Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1 }}>
+                      {aiResult.requiredSkills.map((s, idx) => (
+                        <Chip key={idx} label={s} size="small" />
+                      ))}
+                    </Stack>
+                  </>
+                )}
+                {aiResult.experienceLevel && (
+                  <>
+                    <Typography variant="subtitle2">Experience Level</Typography>
+                    <DialogContentText sx={{ mb: 1 }}>{aiResult.experienceLevel}</DialogContentText>
+                  </>
+                )}
+                {Array.isArray(aiResult.keyRequirements) && aiResult.keyRequirements.length > 0 && (
+                  <>
+                    <Typography variant="subtitle2">Key Requirements</Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1 }}>
+                      {aiResult.keyRequirements.map((r, idx) => (
+                        <Chip key={idx} label={r} size="small" variant="outlined" />
+                      ))}
+                    </Stack>
+                  </>
+                )}
+                {(aiResult.roleType || aiResult.difficulty) && (
+                  <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                    {aiResult.roleType && <Chip label={aiResult.roleType} color="default" size="small" />}
+                    {aiResult.difficulty && <Chip label={aiResult.difficulty} color="info" size="small" />}
+                  </Stack>
+                )}
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setAiOpen(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
       </CardContent>
     </Card>
   );
