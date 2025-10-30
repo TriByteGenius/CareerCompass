@@ -12,7 +12,7 @@ CareerCompass is a microservices-based web platform for discovering job opportun
 - **JobService (Java):** Job data and search; AI job analysis; publishes/consumes job-related events; Redis-backed AI result cache.
 - **UserJobService (Java):** Favorites and application tracking; consumes user/job events to maintain user–job views.
 - **Python Service (FastAPI):** Page fetching/parsing and auxiliary analysis; integrates with RabbitMQ.
-- **Frontend (React + Vite):** SPA consuming backend via gateway paths and configurable relative APIs [[memory:6234778]].
+- **Frontend (React + Vite):** SPA consuming backend via gateway paths and configurable relative APIs.
 
 ### Middleware
 - **RabbitMQ (AMQP):**
